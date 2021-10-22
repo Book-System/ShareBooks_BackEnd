@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.Lob;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -40,6 +40,9 @@ public class Member {
     @Column(name = "NICKNAME")
     private String nickname;
 
+    @Column(name = "PHONE")
+    private String phone;
+
     @Column(name = "ZIPCODE")
     private int zipcode;
 
@@ -50,4 +53,14 @@ public class Member {
     @CreationTimestamp
     @Column(name = "REGDATE", updatable = false)
     private Date regdate;
+
+    @Lob
+    @Column(name = "IMAGE")
+    private byte[] image;
+
+    @Column(name = "IMAGESIZE")
+    private long imagesize;
+
+    @Column(name = "IMAGETYPE")
+    private String imagetype;
 }
