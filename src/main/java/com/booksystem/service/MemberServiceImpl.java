@@ -40,9 +40,9 @@ public class MemberServiceImpl implements MemberService {
 
     // 회원정보 조회
     @Override
-    public Member getMember(String memberid) {
+    public Member getMember(String memberId) {
         // 아이디를 조건으로 검색하여 없을 경우 null을 리턴
-        Optional<Member> member = mRepository.findById(memberid);
+        Optional<Member> member = mRepository.findById(memberId);
         return member.orElse(null);
     }
 
@@ -66,7 +66,23 @@ public class MemberServiceImpl implements MemberService {
 
     // 비밀번호 중복확인
     @Override
-    public String checkMemberPw(String memberid) {
+    public String checkMemberPw(String memberId) {
         return null;
+    }
+
+    // 비밀번호 찾기
+    @Override
+    public boolean findMemberPw(String memberId, String memberName) {
+        // DB에서 아이디에 해당하는 정보 조회
+        Member member = mRepository.findById(memberId).get();
+
+        System.out.println(member.getName());
+
+        // member객체가 null이 아니고, 이름이 입력받은 값과 동일할 경우 true반환
+        if (member != null && member.getName().equals(memberName)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

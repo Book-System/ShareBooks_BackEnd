@@ -1,16 +1,23 @@
 package com.booksystem.restcontroller;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.booksystem.entity.Mail;
 import com.booksystem.entity.Member;
 import com.booksystem.jwt.JwtUtil;
 import com.booksystem.service.MemberService;
+import com.booksystem.service.SendEmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,6 +36,9 @@ public class ApiMemberController {
 
     @Autowired
     MemberService mService;
+
+    @Autowired
+    SendEmailService sendEmailService;
 
     @Autowired
     JwtUtil jwtUtil;
@@ -101,21 +111,39 @@ public class ApiMemberController {
         try {
             // 토큰이 생성되었고, 유효시간이 만료되지 않았다면 회원정보수정 실행
             if (token != "" && !jwtUtil.isTokenExpired(token)) {
-                int result = 0;
+                // 회원 아이디를 통해 DB에 저장된 객체 추출하기
+                String memberId = jwtUtil.extractUsername(token);
+                Member tempMember = mService.getMember(memberId);
+
                 // 프로필 사진을 변경할 경우
                 if (file.getSize() > 0) {
-                    // 이미지 설정
-                    member.setImage(file.getBytes());
-                    member.setImagesize(file.getSize());
-                    member.setImagetype(file.getContentType());
-                    result = mService.updateMemberWithImage(member);
+                    // 회원정보 설정
+                    tempMember.setNickname(member.getNickname());
+                    tempMember.setPhone(member.getPhone());
+                    tempMember.setZipcode(member.getZipcode());
+                    tempMember.setAddress(member.getAddress());
+                    tempMember.setImage(file.getBytes());
+                    tempMember.setImagesize(file.getSize());
+                    tempMember.setImagetype(file.getContentType());
+
+                    // updateMemberWithImage메소드 호출
+                    int result = mService.updateMemberWithImage(tempMember);
+                    map.put("result", Long.valueOf(result));
+                    map.put("data", "회원정보수정을 성공했습니다.");
                 }
                 // 프로필 사진을 변경하지 않을 경우
                 else {
-                    result = mService.updateMember(member);
+                    // 회원정보 설정
+                    tempMember.setNickname(member.getNickname());
+                    tempMember.setPhone(member.getPhone());
+                    tempMember.setZipcode(member.getZipcode());
+                    tempMember.setAddress(member.getAddress());
+
+                    // updateMember메소드 호출
+                    int result = mService.updateMember(member);
+                    map.put("result", Long.valueOf(result));
+                    map.put("data", "회원정보수정을 성공했습니다.");
                 }
-                map.put("result", Long.valueOf(result));
-                map.put("data", "회원정보수정을 성공했습니다.");
             } else {
                 map.put("result", 0L);
                 map.put("data", "회원정보수정을 실패했습니다.");
@@ -141,12 +169,12 @@ public class ApiMemberController {
 
             // 중복되는 아이디가 존재할 경우
             if (result == 1) {
-                map.put("result", Long.valueOf(result));
+                map.put("result", 0L);
                 map.put("data", "이미 사용중인 아이디입니다.");
             }
             // 중복되는 아이디가 없는 경우
             else {
-                map.put("result", Long.valueOf(result));
+                map.put("result", 1L);
                 map.put("data", "사용가능한 아이디입니다.");
             }
         } catch (Exception e) {
@@ -166,16 +194,16 @@ public class ApiMemberController {
         Map<String, Object> map = new HashMap<>();
         try {
             // checkMemberNickname메소드를 호출하여 닉네임이 존재하는지 확인한다.(있을 경우 1, 없을 경우 0 리턴)
-            int result = mService.checkMemberId(memberNickname);
+            int result = mService.checkMemberNickname(memberNickname);
 
             // 중복되는 아이디가 존재할 경우
             if (result == 1) {
-                map.put("result", Long.valueOf(result));
+                map.put("result", 0L);
                 map.put("data", "이미 사용중인 닉네임입니다.");
             }
             // 중복되는 아이디가 없는 경우
             else {
-                map.put("result", Long.valueOf(result));
+                map.put("result", 1L);
                 map.put("data", "사용가능한 닉네임입니다.");
             }
         } catch (Exception e) {
@@ -212,7 +240,7 @@ public class ApiMemberController {
                     // 새로운 비밀번호 암호화 수행
                     member.setPassword(bcpe.encode(memberNewPw));
 
-                    // 결과 값 저장
+                    // updatePassword메소드 호출
                     int result = mService.updatePassword(member);
                     map.put("result", Long.valueOf(result));
                     map.put("data", "비밀번호 변경을 성공했습니다.");
@@ -248,6 +276,149 @@ public class ApiMemberController {
             e.printStackTrace();
             map.put("result", 0L);
             map.put("data", "로그인을 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 프로필사진 조회
+    // GET > http://localhost:9090/REST/api/member/image
+    @RequestMapping(value = "/image", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<byte[]> memberImageGet(@RequestHeader("token") String token) throws IOException {
+        try {
+            // 토큰에 해당하는 아이디를 가져온다.
+            String memberId = jwtUtil.extractUsername(token);
+
+            // memberImage메소드를 호출
+            Member member = mService.getMember(memberId);
+
+            // 이미지가 있을 경우
+            if (member.getImage().length > 0) {
+                HttpHeaders headers = new HttpHeaders();
+                if (member.getImagetype().equals("image/jpeg")) {
+                    headers.setContentType(MediaType.IMAGE_JPEG);
+                } else if (member.getImagetype().equals("image/png")) {
+                    headers.setContentType(MediaType.IMAGE_PNG);
+                } else if (member.getImagetype().equals("image/gif")) {
+                    headers.setContentType(MediaType.IMAGE_GIF);
+                }
+                // 저장된 이미지 출력
+                ResponseEntity<byte[]> response = new ResponseEntity<>(member.getImage(), headers, HttpStatus.OK);
+                return response;
+            } else {
+                // 기본 이미지 출력
+                InputStream iStream = resourceLoader.getResource("classpath:/static/images/default.png")
+                        .getInputStream();
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.IMAGE_PNG);
+                ResponseEntity<byte[]> response = new ResponseEntity<>(iStream.readAllBytes(), headers, HttpStatus.OK);
+                return response;
+            }
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+
+            // 기본 이미지 출력
+            InputStream iStream = resourceLoader.getResource("classpath:/static/images/default.png").getInputStream();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.IMAGE_PNG);
+            ResponseEntity<byte[]> response = new ResponseEntity<>(iStream.readAllBytes(), headers, HttpStatus.OK);
+            return response;
+        }
+    }
+
+    // 비밀번호 찾기(아이디, 이름)
+    // GET > http://localhost:9090/REST/api/member/findpw
+    @RequestMapping(value = "/findpw", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> memberFindPwGet(@RequestParam String memberId, @RequestParam String memberName) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+
+            System.out.println(memberId);
+            System.out.println(memberName);
+
+            // findMemberPw메서드 호출(true일 경우 통과)
+            boolean result = mService.findMemberPw(memberId, memberName);
+
+            if (result == true) {
+                map.put("result", 1L);
+                map.put("data", "비밀번호 임시번호를 발송합니다.");
+            } else {
+                map.put("result", 0L);
+                map.put("data", "아이디와 이름정보가 일치하는 사용자가 존재하지 않습니다.");
+            }
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "아이디와 이름정보가 일치하는 사용자가 존재하지 않습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 임시 비밀번호 전송
+    // POST > http://localhost:9090/REST/api/member/sendemail
+    @RequestMapping(value = "/sendemail", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> memberSendEmailPost(@RequestParam(name = "memberId") String memberId,
+            @RequestParam(name = "memberName") String memberName) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            Mail mail = sendEmailService.createMailAndChangePassword(memberId, memberName);
+            sendEmailService.mailSend(mail);
+            map.put("result", 1L);
+            map.put("data", "임시번호가 발급을 성공했습니다.");
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "임시번호 발급을 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 회원가입 시 이메일 인증코드 전송 => 스케줄러도 함께 실행
+    // POST > http://localhost:9090/REST/api/member/confirmemail
+    @RequestMapping(value = "/confirmemail", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> memberConfirmEmailPost(@RequestParam(name = "memberId") String memberId) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            Mail mail = sendEmailService.createMailAndConfirmEmail(memberId);
+            sendEmailService.mailSend(mail);
+            map.put("result", 1L);
+            map.put("data", "이메일 인증코드 발송을 성공했습니다.");
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "이메일 인증코드 발송을 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 이메일 인증코드 확인
+    // POST > http://localhost:9090/REST/api/member/validemail
+    @RequestMapping(value = "/validemail", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> memberValidEmailPost(@RequestParam(name = "memberId") String memberId,
+            @RequestParam(name = "emailCode") String emailCode) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // 1일 경우 이메일 인증 완료, 0일 경우 다시 이메일 인증을 수행해야한다.
+            int result = sendEmailService.validEmailCode(memberId, emailCode, new Date());
+            if (result == 1) {
+                map.put("result", 1L);
+                map.put("data", "이메일 인증을 완료하였습니다.");
+            } else {
+                map.put("result", 0L);
+                map.put("data", "이메일 인증을 실패하였습니다.");
+            }
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "이메일 인증을 실패하였습니다.");
         }
         // 결과 값 리턴
         return map;

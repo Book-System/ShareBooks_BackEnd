@@ -18,14 +18,14 @@ import javax.persistence.Column;
 @Setter
 @ToString
 @NoArgsConstructor
-@Table(name = "Category")
+@Table(name = "CATEGORY")
 @SequenceGenerator(name = "SEQ_CATEGORY_NO", sequenceName = "SEQ_CATEGORY_NO", initialValue = 1, allocationSize = 1)
 public class Category {
 
     @Id
     @Column(name = "CODE")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_CATEGORY_NO")
-    private Long no = 0L;
+    private Long code = 0L;
 
     @Column(name = "NAME")
     private String name = null;

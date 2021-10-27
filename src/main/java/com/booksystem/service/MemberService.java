@@ -25,11 +25,14 @@ public interface MemberService {
     public int checkMemberNickname(String memberNickname);
 
     // 회원정보 조회
-    public Member getMember(String memberid);
+    public Member getMember(String memberId);
 
     // 비밀번호 중복확인
-    public String checkMemberPw(String memberid);
+    public String checkMemberPw(String memberId);
 
     // 비밀번호 변경
     public int updatePassword(Member member);
+
+    // 비밀번호 찾기
+    public boolean findMemberPw(String memberId, String memberName);
 }

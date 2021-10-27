@@ -18,6 +18,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.Lob;
 
@@ -26,7 +27,7 @@ import javax.persistence.Lob;
 @Setter
 @ToString
 @NoArgsConstructor
-@Table(name = "Book")
+@Table(name = "BOOK")
 @SequenceGenerator(name = "SEQ_BOOK_NO", sequenceName = "SEQ_BOOK_NO", initialValue = 1, allocationSize = 1)
 public class Book {
 
@@ -58,6 +59,7 @@ public class Book {
     @Column(name = "BOOK_CONTENT")
     private String book_content = null;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @CreationTimestamp
     @Column(name = "REGDATE")
     private Date regdate;
