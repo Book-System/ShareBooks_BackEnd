@@ -225,9 +225,6 @@ public class ApiBoardController {
                     map.put("result", 0L);
                     map.put("data", "글 수정을 실패했습니다.");
                 }
-            } else {
-                map.put("result", 0L);
-                map.put("data", "글 수정을 실패했습니다.");
             }
         } catch (Exception e) {
             e.printStackTrace();

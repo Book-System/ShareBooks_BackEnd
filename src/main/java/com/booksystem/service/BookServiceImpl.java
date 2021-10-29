@@ -3,6 +3,7 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.Book;
+import com.booksystem.entity.BookProjection;
 import com.booksystem.repository.BookRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class BookServiceImpl implements BookService {
     BookRepository bRepository;
 
     @Override
-    public List<Book> listBook() {
+    public List<BookProjection> listBook() {
         return bRepository.queryListBook();
     }
 
@@ -30,22 +31,27 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Book detailBook(Long no) {
-        return bRepository.queryDetailBook(no);
+    public Book detailBook(Long bookNo) {
+        return bRepository.queryDetailBook(bookNo);
     }
 
     @Override
-    public int updateBook(Book book) {
-        return bRepository.queryUpdateBook(book);
+    public Book updateBook(Book book) {
+        return bRepository.save(book);
     }
 
     @Override
-    public int deleteBook(Long no) {
-        return bRepository.queryDeleteBook(no);
+    public int deleteBook(Long bookNo) {
+        return bRepository.queryDeleteBook(bookNo);
     }
 
     @Override
     public Book registerBook(Book book) {
         return bRepository.save(book);
+    }
+
+    @Override
+    public Book detailBookJPA(Long bookNo) {
+        return bRepository.findByBookNo(bookNo);
     }
 }

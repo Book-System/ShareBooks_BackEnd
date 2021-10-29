@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
-import javax.persistence.FetchType;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,39 +25,39 @@ import lombok.ToString;
 public class Reservation {
 
     @Id
-    @Column(name = "NO")
+    @Column(name = "RESERVATION_NO")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_RESERVATION_NO")
-    private long no = 0L;
+    private Long reservationNo = 0L;
 
     @Column(name = "PHONE")
-    private long phone = 0L;
+    private String phone = null;
 
     @Column(name = "RESERVATION_START_DATE")
-    private String reservation_start_date = null;
+    private String reservationStartDate = null;
 
     @Column(name = "RESERVATION_END_DATE")
-    private String reservation_end_date = null;
+    private String reservationEndDate = null;
 
     @Column(name = "RESERVATION_START_TIME")
-    private String reservation_start_time = null;
+    private String reservationStartTime = null;
 
     @Column(name = "RESERVATION_END_TIME")
-    private String reservation_end_time = null;
+    private String reservationEndTime = null;
 
     @Column(name = "REQUEST")
     private boolean request = false;
 
     @Column(name = "REQUEST_MESSAGE")
-    private String request_message = null;
+    private String requestMessage = null;
 
     @Column(name = "REJECT_MESSAGE")
-    private String reject_message = null;
+    private String rejectMessage = null;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "BOOK_NO")
     private Book book;
 

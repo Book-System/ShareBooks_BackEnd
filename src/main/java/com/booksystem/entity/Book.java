@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Column;
@@ -32,9 +31,9 @@ import javax.persistence.Lob;
 public class Book {
 
     @Id
-    @Column(name = "NO")
+    @Column(name = "BOOK_NO")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BOOK_NO")
-    private Long no = 0L;
+    private Long bookNo = 0L;
 
     @Column(name = "TITLE")
     private String title = null;
@@ -44,7 +43,7 @@ public class Book {
     private String content = null;
 
     @Column(name = "PRICE")
-    private long price = 0L;
+    private Long price = 0L;
 
     @Column(name = "ADDRESS")
     private String address = null;
@@ -53,22 +52,22 @@ public class Book {
     private String tag = null;
 
     @Column(name = "BOOK_TITLE")
-    private String book_title = null;
+    private String bookTitle = null;
 
     @Lob
     @Column(name = "BOOK_CONTENT")
-    private String book_content = null;
+    private String bookContent = null;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @CreationTimestamp
-    @Column(name = "REGDATE")
+    @Column(name = "REGDATE", updatable = false)
     private Date regdate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "CATEGORY_CODE")
     private Category category;
 }

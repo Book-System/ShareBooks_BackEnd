@@ -5,6 +5,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.booksystem.entity.Book;
+import com.booksystem.entity.BookProjection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,9 +16,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-    // 책 목록 조회
+    // 책 목록 조회 => 이부분 수정해야함
     @Query(value = "SELECT * FROM BOOK", nativeQuery = true)
-    public List<Book> queryListBook();
+    public List<BookProjection> queryListBook();
 
     // 카테고리에 해당하는 책 목록 조회
     @Query(value = "SELECT * FROM BOOK WHERE CATEGORY_CODE=:categoryCode", nativeQuery = true)
@@ -28,18 +29,21 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     public List<Book> queryListMyBook(@Param("memberId") String memberId);
 
     // 책 상세 조회
-    @Query(value = "SELECT * FROM BOOK WHERE NO=:no", nativeQuery = true)
-    public Book queryDetailBook(@Param("no") Long no);
+    @Query(value = "SELECT * FROM BOOK WHERE BOOK_NO=:bookNo", nativeQuery = true)
+    public Book queryDetailBook(@Param("bookNo") Long bookNo);
+
+    // 책 상세 조회(JPA)
+    public Book findByBookNo(Long bookNo);
 
     // 책 수정
     @Transactional
     @Modifying
-    @Query(value = "UPDATE BOOK SET TITLE=:#{#book.title}, CONTENT=:#{#book.content}, PRICE=:#{#book.price}, ADDRESS=:#{#book.address}, TAG=:#{#book.tag}, BOOK_TITLE=:#{#book.book_title}, BOOK_CONTENT=:#{#book.book_content} WHERE NO=:#{#book.no}", nativeQuery = true)
+    @Query(value = "UPDATE BOOK SET TITLE=:#{#book.title}, CONTENT=:#{#book.content}, PRICE=:#{#book.price}, ADDRESS=:#{#book.address}, TAG=:#{#book.tag}, BOOK_TITLE=:#{#book.bookTitle}, BOOK_CONTENT=:#{#book.bookContent} WHERE BOOK_NO=:#{#book.bookNo}", nativeQuery = true)
     public int queryUpdateBook(@Param("book") Book book);
 
     // 책 삭제
     @Transactional
     @Modifying
-    @Query(value = "DELETE FROM BOOK WHERE NO=:no", nativeQuery = true)
-    public int queryDeleteBook(@Param("no") Long no);
+    @Query(value = "DELETE FROM BOOK WHERE BOOK_NO=:bookNo", nativeQuery = true)
+    public int queryDeleteBook(@Param("bookNo") Long bookNo);
 }
