@@ -28,9 +28,9 @@ import lombok.ToString;
 @SequenceGenerator(name = "SEQ_BOARD_NO", sequenceName = "SEQ_BOARD_NO", initialValue = 1, allocationSize = 1)
 public class Board {
     @Id
-    @Column(name = "NO")
+    @Column(name = "BOARD_NO")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BOARD_NO")
-    private Long no;
+    private Long boardNo;
 
     @Column(name = "TITLE")
     private String title;
@@ -45,6 +45,10 @@ public class Board {
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
+
+    @ManyToOne
+    @JoinColumn(name = "RESERVATION_NO")
+    private Reservation reservation;
 
     @Column(name = "INQUIRY")
     private String inquiry = null; // 문의유형

@@ -25,9 +25,9 @@ import lombok.ToString;
 @SequenceGenerator(name = "SEQ_BOARDIMAGE_NO", sequenceName = "SEQ_BOARDIMAGE_NO", initialValue = 1, allocationSize = 1)
 public class BoardImage {
     @Id
-    @Column(name = "NO")
+    @Column(name = "BOARDIMAGE_NO")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BOARDIMAGE_NO")
-    private Long no;
+    private Long boardimageNo;
 
     @Lob
     @Column(name = "IMAGE")

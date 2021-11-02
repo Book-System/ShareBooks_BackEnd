@@ -1,6 +1,6 @@
 package com.booksystem.service;
 
-import java.util.List;
+import java.util.Optional;
 
 import com.booksystem.entity.Board;
 import com.booksystem.repository.BoardRepository;
@@ -20,27 +20,22 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public List<Board> selectBoard() {
-        return boRepository.querySelectBoard();
+    public Optional<Board> selectOneBoard(Long boardNo) {
+        return boRepository.querySelectOneBoard(boardNo);
     }
 
     @Override
-    public Board selectOneBoard(Long no) {
-        return boRepository.querySeleItemOneBoard(no).orElse(null);
+    public String selectContentBoard(Long boardNo) {
+        return boRepository.querySelectContentBoard(boardNo); // 고객센터 상세페이지(내용만)
     }
 
     @Override
-    public int deleteBoard(Long no) {
-        return boRepository.queryDeleteBoard(no);
+    public int deleteBoard(Long boardNo) {
+        return boRepository.queryDeleteBoard(boardNo);
     }
 
     @Override
     public int updateBoard(Board board) {
         return boRepository.queryUpdateBoard(board);
     }
-
-    // @Override
-    // public Board getByBoardNo() {
-    // return null;
-    // }
 }

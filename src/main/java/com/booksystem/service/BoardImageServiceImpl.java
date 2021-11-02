@@ -3,7 +3,6 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.BoardImage;
-import com.booksystem.entity.BoardImageProjection;
 import com.booksystem.repository.BoardImageRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +20,27 @@ public class BoardImageServiceImpl implements BoardImageService {
     }
 
     @Override
-    public List<BoardImageProjection> selectBoardImage(Long no) {
-        return biRepository.querySelectBoaradImage(no);
+    public List<BoardImage> selectBoardImagePreview(Long boardNo) {
+        return biRepository.findByBoard_BoardNo(boardNo);
     }
 
     @Override
-    public List<BoardImage> selectBoardImagePreview(Long no) {
-        return biRepository.findByBoard_No(no);
-    }
-
-    @Override
-    public int deleteBoardImage(Long no) {
-        return biRepository.queryDeleteBoardImage(no);
+    public int deleteBoardImage(Long boardNo) {
+        return biRepository.queryDeleteBoardImage(boardNo);
     }
 
     @Override
     public int updateBoardImage(BoardImage boardImage) {
         return biRepository.queryUpdateBoardImage(boardImage);
+    }
+
+    @Override
+    public int checkBoardImage(Long boardNo) {
+        return biRepository.queryCheckBoardImage(boardNo);
+    }
+
+    @Override
+    public BoardImage findBoardImage(Long boardimageNo) {
+        return biRepository.queryfindBoardImage(boardimageNo);
     }
 }
