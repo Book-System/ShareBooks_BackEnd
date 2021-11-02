@@ -202,6 +202,30 @@ public class ApiBookController {
         return map;
     }
 
+    // 등록한 책 목록 조회
+    // GET > http://localhost:9090/REST/api/book/list/rend
+    @RequestMapping(value = "/list/rend", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> listRendBookGet(@RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                String memberId = jwtUtil.extractUsername(token);
+                List<Book> list = bService.listMyBook(memberId);
+                map.put("result", 1L);
+                map.put("data", list);
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "책 목록 조회를 실패했습니다.");
+        }
+        return map;
+    }
+
     // 책 상세 조회
     // GET > http://localhost:9090/REST/api/book/detail?bookno=?
     @RequestMapping(value = "/detail", method = {

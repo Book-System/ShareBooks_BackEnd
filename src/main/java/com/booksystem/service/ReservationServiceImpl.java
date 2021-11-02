@@ -28,4 +28,14 @@ public class ReservationServiceImpl implements ReservationService {
     public int deleteReservation(Long reservationNo) {
         return reservationRepository.queryDeleteReservation(reservationNo);
     }
+
+    @Override
+    public int requestAcceptReservation(Long reservationNo) {
+        return reservationRepository.queryRequestAcceptReservation(reservationNo);
+    }
+
+    @Override
+    public int requestRefuseReservation(Long reservationNo, String rejectMessage) {
+        return reservationRepository.queryRequestRefuseReservation(reservationNo, rejectMessage);
+    }
 }

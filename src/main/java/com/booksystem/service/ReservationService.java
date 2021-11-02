@@ -17,4 +17,11 @@ public interface ReservationService {
 
     // 예약 정보 삭제
     public int deleteReservation(Long reservationNo);
+
+    // 판매자 => 요청 수락
+    public int requestAcceptReservation(Long reservationNo);
+
+    // 판매자 => 요청 거절, 거절 메세지
+    public int requestRefuseReservation(Long reservationNo, String rejectMessage);
+
 }

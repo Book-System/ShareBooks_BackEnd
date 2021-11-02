@@ -24,4 +24,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Modifying
     @Query(value = "DELETE FROM RESERVATION WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
     public int queryDeleteReservation(@Param("reservationNo") Long reservationNo);
+
+    // 판매자 => 요청 수락
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE RESERVATION SET REQUEST=true WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
+    public int queryRequestAcceptReservation(@Param("reservationNo") Long reservationNo);
+
+    // 판매자 => 요청 거절, 거절 메세지
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE RESERVATION SET REJECT_MESSAGE=:rejectMessage WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
+    public int queryRequestRefuseReservation(@Param("reservationNo") Long reservationNo,
+            @Param("rejectMessage") String rejectMessage);
+
 }

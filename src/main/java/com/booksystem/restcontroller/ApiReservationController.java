@@ -45,8 +45,8 @@ public class ApiReservationController {
     // POST > http://localhost:9090/REST/api/reservation/register
     @RequestMapping(value = "/register", method = {
             RequestMethod.POST }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> registPost(@ModelAttribute Reservation reservation, @RequestParam("bookNo") Long bookNo,
-            @RequestHeader("token") String token) {
+    public Map<String, Object> reservationRegisterPost(@ModelAttribute Reservation reservation,
+            @RequestParam("bookNo") Long bookNo, @RequestHeader("token") String token) {
         Map<String, Object> map = new HashMap<>();
         try {
             // 로그인된 사용자를 검증
@@ -87,7 +87,7 @@ public class ApiReservationController {
     // GET > http://localhost:9090/REST/api/reservation/rent/list
     @RequestMapping(value = "/rent/list", method = {
             RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> rentGet(@RequestHeader("token") String token) {
+    public Map<String, Object> reservationListGet(@RequestHeader("token") String token) {
         Map<String, Object> map = new HashMap<>();
         try {
             // 로그인된 사용자를 검증
@@ -115,7 +115,8 @@ public class ApiReservationController {
     // DELETE > http://localhost:9090/REST/api/reservation/rent/delete
     @RequestMapping(value = "/rent/delete", method = {
             RequestMethod.DELETE }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> rentDelete(@RequestParam Long reservationno, @RequestHeader("token") String token) {
+    public Map<String, Object> reservationRentDelete(@RequestParam Long reservationno,
+            @RequestHeader("token") String token) {
         Map<String, Object> map = new HashMap<>();
         try {
             if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
@@ -136,6 +137,64 @@ public class ApiReservationController {
             e.printStackTrace();
             map.put("result", 0L);
             map.put("data", "책 예약 취소를 실패했습니다.");
+        }
+        return map;
+    }
+
+    // 판매자 => 요청 수락
+    // PUT > http://localhost:9090/REST/api/reservation/request/accept
+    @RequestMapping(value = "/request/accept", method = {
+            RequestMethod.PUT }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> reservationRequestAcceptPut(@RequestParam(name = "reservationno") Long reservationno,
+            @RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                int result = reservationService.requestAcceptReservation(reservationno);
+                if (result == 1) {
+                    map.put("result", 1L);
+                    map.put("data", "책 예약 요청 수락을 성공하였습니다.");
+                } else {
+                    map.put("result", 0L);
+                    map.put("data", "책 예약 요청 수락을 실패하였습니다.");
+                }
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "책 예약 요청 수락을 실패하였습니다.");
+        }
+        return map;
+    }
+
+    // 판매자 => 요청 거절, 거절 메세지
+    // PUT > http://localhost:9090/REST/api/reservation/request/refuse
+    @RequestMapping(value = "/request/refuse", method = {
+            RequestMethod.PUT }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> reservationRequestRefusePut(@RequestParam(name = "reservationno") Long reservationno,
+            @RequestParam(name = "rejectmessage") String rejectmessage, @RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                int result = reservationService.requestRefuseReservation(reservationno, rejectmessage);
+                if (result == 1) {
+                    map.put("result", 1L);
+                    map.put("data", "책 예약 요청 거절을 성공했습니다.");
+                } else {
+                    map.put("result", 0L);
+                    map.put("data", "책 예약 요청 거절을 실패했습니다.");
+                }
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "책 예약 요청 거절을 실패했습니다.");
         }
         return map;
     }
