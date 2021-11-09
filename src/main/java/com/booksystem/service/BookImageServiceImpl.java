@@ -36,8 +36,7 @@ public class BookImageServiceImpl implements BookImageService {
 
     @Override
     public BookImage getBookImage(Long bookimageNo) {
-        return null;
-        // return bookImageRepository.getById(bookimageNo);
+        return bookImageRepository.getById(bookimageNo);
     }
 
     @Override

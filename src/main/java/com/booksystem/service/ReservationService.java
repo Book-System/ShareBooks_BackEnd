@@ -3,6 +3,7 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.Reservation;
+import com.booksystem.entity.ReservationProjection;
 
 import org.springframework.stereotype.Service;
 
@@ -10,7 +11,10 @@ import org.springframework.stereotype.Service;
 public interface ReservationService {
 
     // 예약 목록 조회
-    public List<Reservation> listReservation(String memberId);
+    public List<ReservationProjection> listReservation(String memberId);
+
+    // 예약 상세 조회
+    public ReservationProjection detailReservation(Long reservationNo);
 
     // 예약 정보 등록
     public Reservation registerReservation(Reservation reservation);
@@ -23,5 +27,4 @@ public interface ReservationService {
 
     // 판매자 => 요청 거절, 거절 메세지
     public int requestRefuseReservation(Long reservationNo, String rejectMessage);
-
 }

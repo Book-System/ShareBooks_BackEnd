@@ -29,18 +29,18 @@ public class BookImage {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_BOOKIMAGE_NO")
     private Long bookimageNo;
 
-    @Column(name = "ORIGINALNAME")
-    private String originalname;
-
-    @Column(name = "FILETYPE")
-    private String filetype;
-
-    @Column(name = "FILESIZE")
-    private Long filesize;
-
     @Lob
-    @Column(name = "FILEDATA")
-    private byte[] filedata;
+    @Column(name = "IMAGE")
+    private byte[] image;
+
+    @Column(name = "IMAGESIZE")
+    private Long imagesize;
+
+    @Column(name = "IMAGETYPE")
+    private String imagetype;
+
+    @Column(name = "IMAGENAME")
+    private String imagename;
 
     @Column(name = "PRIORITY")
     private int priority;

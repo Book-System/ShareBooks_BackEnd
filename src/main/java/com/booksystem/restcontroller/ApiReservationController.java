@@ -7,6 +7,7 @@ import java.util.Map;
 import com.booksystem.entity.Book;
 import com.booksystem.entity.Member;
 import com.booksystem.entity.Reservation;
+import com.booksystem.entity.ReservationProjection;
 import com.booksystem.jwt.JwtUtil;
 import com.booksystem.repository.ReservationRepository;
 import com.booksystem.service.BookService;
@@ -96,9 +97,41 @@ public class ApiReservationController {
                 String memberId = jwtUtil.extractUsername(token);
 
                 // 자신이 빌린 책들의 정보를 조회
-                List<Reservation> list = reservationService.listReservation(memberId);
+                List<ReservationProjection> list = reservationService.listReservation(memberId);
                 map.put("result", 1L);
                 map.put("data", list);
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "빌린 책 조회를 실패했습니다.");
+        }
+        return map;
+    }
+
+    // 빌린 책 상세 조회
+    // GET > http://localhost:9090/REST/api/reservation/rent/detail?reservationno=5
+    @RequestMapping(value = "/rent/detail", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> reservationDetailGet(@RequestParam("reservationno") Long reservationno,
+            @RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // 로그인된 사용자를 검증
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                // 자신이 빌린 책 중 한권 상세 조회
+                ReservationProjection reservation = reservationService.detailReservation(reservationno);
+
+                if (reservation != null) {
+                    map.put("result", 1L);
+                    map.put("data", reservation);
+                } else {
+                    map.put("result", 1L);
+                    map.put("data", "예약정보가 존재하지 않습니다.");
+                }
             } else {
                 map.put("result", 0L);
                 map.put("data", "로그인 인증을 실패했습니다.");
@@ -115,7 +148,7 @@ public class ApiReservationController {
     // DELETE > http://localhost:9090/REST/api/reservation/rent/delete
     @RequestMapping(value = "/rent/delete", method = {
             RequestMethod.DELETE }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> reservationRentDelete(@RequestParam Long reservationno,
+    public Map<String, Object> reservationRentDelete(@RequestParam("reservationno") Long reservationno,
             @RequestHeader("token") String token) {
         Map<String, Object> map = new HashMap<>();
         try {

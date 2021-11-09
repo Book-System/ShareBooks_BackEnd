@@ -3,6 +3,7 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.Reservation;
+import com.booksystem.entity.ReservationProjection;
 import com.booksystem.repository.ReservationRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,7 @@ public class ReservationServiceImpl implements ReservationService {
     ReservationRepository reservationRepository;
 
     @Override
-    public List<Reservation> listReservation(String memberId) {
+    public List<ReservationProjection> listReservation(String memberId) {
         return reservationRepository.queryListReservation(memberId);
     }
 
@@ -37,5 +38,10 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     public int requestRefuseReservation(Long reservationNo, String rejectMessage) {
         return reservationRepository.queryRequestRefuseReservation(reservationNo, rejectMessage);
+    }
+
+    @Override
+    public ReservationProjection detailReservation(Long reservationNo) {
+        return reservationRepository.queryDetailReservation(reservationNo);
     }
 }

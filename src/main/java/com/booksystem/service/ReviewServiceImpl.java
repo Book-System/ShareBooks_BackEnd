@@ -3,6 +3,7 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.Review;
+import com.booksystem.entity.ReviewProjection;
 import com.booksystem.repository.ReviewRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public Review detailReview(Long reviewNo) {
+    public ReviewProjection detailReview(Long reviewNo) {
         return reviewRepository.queryDetailReview(reviewNo);
     }
 
@@ -36,12 +37,12 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<Review> listReview() {
+    public List<ReviewProjection> listReview() {
         return reviewRepository.queryListReview();
     }
 
     @Override
-    public int countReview(String memberId) {
-        return reviewRepository.queryCountReview(memberId);
+    public int countReview(String memberId, Long bookNo) {
+        return reviewRepository.queryCountReview(memberId, bookNo);
     }
 }

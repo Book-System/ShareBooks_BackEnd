@@ -5,6 +5,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.booksystem.entity.Review;
+import com.booksystem.entity.ReviewProjection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -34,13 +35,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // 리뷰 상세 조회
     @Query(value = "SELECT * FROM REVIEW WHERE REVIEW_NO=:reviewNo", nativeQuery = true)
-    public Review queryDetailReview(@Param("reviewNo") Long reviewNo);
+    public ReviewProjection queryDetailReview(@Param("reviewNo") Long reviewNo);
 
     // 리뷰 목록 조회
     @Query(value = "SELECT * FROM REVIEW", nativeQuery = true)
-    public List<Review> queryListReview();
+    public List<ReviewProjection> queryListReview();
 
     // 리뷰 개수 조회
-    @Query(value = "SELECT COUNT(*) FROM REVIEW WHERE MEMBER_ID=:memberId", nativeQuery = true)
-    public int queryCountReview(@Param("memberId") String memberId);
+    @Query(value = "SELECT COUNT(*) FROM REVIEW WHERE MEMBER_ID=:memberId AND BOOK_NO=:bookNo", nativeQuery = true)
+    public int queryCountReview(@Param("memberId") String memberId, @Param("bookNo") Long bookNo);
 }

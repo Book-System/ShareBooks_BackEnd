@@ -7,6 +7,7 @@ import java.util.Map;
 import com.booksystem.entity.Book;
 import com.booksystem.entity.Member;
 import com.booksystem.entity.Review;
+import com.booksystem.entity.ReviewProjection;
 import com.booksystem.jwt.JwtUtil;
 import com.booksystem.service.BookService;
 import com.booksystem.service.MemberService;
@@ -136,7 +137,7 @@ public class ApiReviewController {
         Map<String, Object> map = new HashMap<>();
         try {
             // detailReview메소드 호출
-            Review review = reviewService.detailReview(reviewno);
+            ReviewProjection review = reviewService.detailReview(reviewno);
 
             map.put("result", 1L);
             map.put("review", review);
@@ -158,7 +159,7 @@ public class ApiReviewController {
         Map<String, Object> map = new HashMap<>();
         try {
             // listReview메소드 호출
-            List<Review> list = reviewService.listReview();
+            List<ReviewProjection> list = reviewService.listReview();
 
             map.put("result", 1L);
             map.put("list", list);
@@ -176,12 +177,13 @@ public class ApiReviewController {
     // 리뷰 개수(1개 이상은 등록이 안되도록..)
     // GET > http://localhost:9090/REST/api/review/count
     @RequestMapping(value = "/count", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> reviewCountGet(@RequestHeader("token") String token) throws Exception {
+    public Map<String, Object> reviewCountGet(@RequestParam("bookno") Long bookNo, @RequestHeader("token") String token)
+            throws Exception {
         Map<String, Object> map = new HashMap<>();
         try {
             String memberId = jwtUtil.extractUsername(token);
             // countReview메소드 호출
-            int result = reviewService.countReview(memberId);
+            int result = reviewService.countReview(memberId, bookNo);
 
             map.put("result", 1L);
             map.put("data", result);

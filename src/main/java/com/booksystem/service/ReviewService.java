@@ -3,6 +3,7 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.Review;
+import com.booksystem.entity.ReviewProjection;
 
 import org.springframework.stereotype.Service;
 
@@ -15,14 +16,14 @@ public interface ReviewService {
     public int removeReview(Long reviewNo);
 
     // 리뷰 조회
-    public Review detailReview(Long reviewNo);
+    public ReviewProjection detailReview(Long reviewNo);
 
     // 리뷰 수정
     public int updateReview(Review review);
 
     // 리뷰 목록 조회
-    public List<Review> listReview();
+    public List<ReviewProjection> listReview();
 
     // 리뷰 개수 조회
-    public int countReview(String memberId);
+    public int countReview(String memberId, Long bookNo);
 }

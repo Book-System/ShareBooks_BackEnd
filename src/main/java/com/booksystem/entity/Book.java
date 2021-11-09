@@ -19,8 +19,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.Lob;
-
 @Entity
 @Getter
 @Setter
@@ -38,7 +36,6 @@ public class Book {
     @Column(name = "TITLE")
     private String title = null;
 
-    @Lob
     @Column(name = "CONTENT")
     private String content = null;
 
@@ -48,13 +45,15 @@ public class Book {
     @Column(name = "ADDRESS")
     private String address = null;
 
+    @Column(name = "HIT")
+    private int hit = 1;
+
     @Column(name = "TAG")
     private String tag = null;
 
     @Column(name = "BOOK_TITLE")
     private String bookTitle = null;
 
-    @Lob
     @Column(name = "BOOK_CONTENT")
     private String bookContent = null;
 

@@ -27,7 +27,7 @@ import lombok.ToString;
 @Table(name = "MEMBER")
 public class Member {
     @Id
-    @Column(name = "ID", length = 100)
+    @Column(name = "ID")
     private String id;
 
     @Column(name = "PASSWORD")
@@ -59,7 +59,7 @@ public class Member {
     private byte[] image;
 
     @Column(name = "IMAGESIZE")
-    private long imagesize;
+    private Long imagesize;
 
     @Column(name = "IMAGETYPE")
     private String imagetype;

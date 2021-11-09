@@ -13,45 +13,50 @@ import org.springframework.stereotype.Service;
 public class BookServiceImpl implements BookService {
 
     @Autowired
-    BookRepository bRepository;
+    BookRepository bookRepository;
 
     @Override
     public List<BookProjection> listBook() {
-        return bRepository.queryListBook();
+        return bookRepository.queryListBook();
+    }
+
+    @Override
+    public List<BookProjection> listRendBook(String memberId) {
+        return bookRepository.queryListRendBook(memberId);
     }
 
     @Override
     public List<Book> listCategoryBook(Long categoryCode) {
-        return bRepository.queryListCategoryBook(categoryCode);
-    }
-
-    @Override
-    public List<Book> listMyBook(String memberId) {
-        return bRepository.queryListMyBook(memberId);
+        return bookRepository.queryListCategoryBook(categoryCode);
     }
 
     @Override
     public Book detailBook(Long bookNo) {
-        return bRepository.queryDetailBook(bookNo);
-    }
-
-    @Override
-    public Book updateBook(Book book) {
-        return bRepository.save(book);
-    }
-
-    @Override
-    public int deleteBook(Long bookNo) {
-        return bRepository.queryDeleteBook(bookNo);
-    }
-
-    @Override
-    public Book registerBook(Book book) {
-        return bRepository.save(book);
+        return bookRepository.queryDetailBook(bookNo);
     }
 
     @Override
     public Book detailBookJPA(Long bookNo) {
-        return bRepository.findByBookNo(bookNo);
+        return bookRepository.findByBookNo(bookNo);
+    }
+
+    @Override
+    public BookProjection detailBookProjection(Long bookNo) {
+        return bookRepository.queryDetailBookProjection(bookNo);
+    }
+
+    @Override
+    public int updateBook(Book book) {
+        return bookRepository.queryUpdateBook(book);
+    }
+
+    @Override
+    public int deleteBook(Long bookNo) {
+        return bookRepository.queryDeleteBook(bookNo);
+    }
+
+    @Override
+    public Book registerBook(Book book) {
+        return bookRepository.save(book);
     }
 }

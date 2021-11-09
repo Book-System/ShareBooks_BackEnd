@@ -5,6 +5,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.booksystem.entity.Reservation;
+import com.booksystem.entity.ReservationProjection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -17,7 +18,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     // 예약 목록 조회
     @Query(value = "SELECT * FROM RESERVATION WHERE MEMBER_ID=:memberId", nativeQuery = true)
-    public List<Reservation> queryListReservation(@Param("memberId") String memberId);
+    public List<ReservationProjection> queryListReservation(@Param("memberId") String memberId);
+
+    // 예약 상세 조회
+    @Query(value = "SELECT * FROM RESERVATION WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
+    public ReservationProjection queryDetailReservation(@Param("reservationNo") Long reservationNo);
 
     // 예약 정보 삭제
     @Transactional
@@ -37,5 +42,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query(value = "UPDATE RESERVATION SET REJECT_MESSAGE=:rejectMessage WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
     public int queryRequestRefuseReservation(@Param("reservationNo") Long reservationNo,
             @Param("rejectMessage") String rejectMessage);
-
 }
