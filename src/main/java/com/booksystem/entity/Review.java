@@ -35,7 +35,7 @@ public class Review {
     private Long reviewNo = 0L;
 
     @Column(name = "RATING")
-    private int rating = 0;
+    private float rating = 0f;
 
     @Column(name = "CONTENT")
     private String content = null;

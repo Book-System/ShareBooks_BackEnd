@@ -59,4 +59,14 @@ public class BookServiceImpl implements BookService {
     public Book registerBook(Book book) {
         return bookRepository.save(book);
     }
+
+    @Override
+    public int countBook(String memberId) {
+        return bookRepository.queryCountBook(memberId);
+    }
+
+    @Override
+    public List<BookProjection> listSearchBook(String address, int page) {
+        return bookRepository.queryListSearchBook(address, page);
+    }
 }

@@ -196,4 +196,45 @@ public class ApiReviewController {
         // 결과 값 리턴
         return map;
     }
+
+    // 리뷰 평균 점수, 개수 조회
+    // GET > http://localhost:9090/REST/api/review/avg?bookno=책번호
+    @RequestMapping(value = "/avg", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> reviewAvgGet(@RequestParam("bookno") Long bookNo) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // avgReview메소드 호출
+            ReviewProjection result = reviewService.avgReview(bookNo);
+            map.put("result", 1L);
+            map.put("data", result);
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "리뷰 평균 점수, 개수 조회를 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 책 번호에 맞는 리뷰 목록 조회
+    // GET > http://localhost:9090/REST/api/review/match/list?bookno=책번호
+    @RequestMapping(value = "/match/list", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> reviewBookNoGet(@RequestParam("bookno") Long bookNo) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // listReview메소드 호출
+            List<Review> list = reviewService.bookNoReview(bookNo);
+            map.put("result", 1L);
+            map.put("list", list);
+            map.put("data", "책 번호에 해당하는 리뷰 목록 조회를 성공했습니다.");
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "책 번호에 해당하는 리뷰 목록 조회를 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
 }

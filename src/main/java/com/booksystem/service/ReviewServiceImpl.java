@@ -45,4 +45,14 @@ public class ReviewServiceImpl implements ReviewService {
     public int countReview(String memberId, Long bookNo) {
         return reviewRepository.queryCountReview(memberId, bookNo);
     }
+
+    @Override
+    public ReviewProjection avgReview(Long bookNo) {
+        return reviewRepository.queryAvgReview(bookNo);
+    }
+
+    @Override
+    public List<Review> bookNoReview(Long bookNo) {
+        return reviewRepository.queryBookNoReview(bookNo);
+    }
 }

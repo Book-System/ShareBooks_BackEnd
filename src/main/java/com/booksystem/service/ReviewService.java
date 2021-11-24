@@ -24,6 +24,12 @@ public interface ReviewService {
     // 리뷰 목록 조회
     public List<ReviewProjection> listReview();
 
+    // 평균 리뷰 점수, 리뷰 목록 조회
+    public ReviewProjection avgReview(Long bookNo);
+
+    // 책 번호에 해당하는 리뷰 목록 조회
+    public List<Review> bookNoReview(Long bookNo);
+
     // 리뷰 개수 조회
     public int countReview(String memberId, Long bookNo);
 }

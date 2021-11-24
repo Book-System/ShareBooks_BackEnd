@@ -44,4 +44,24 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationProjection detailReservation(Long reservationNo) {
         return reservationRepository.queryDetailReservation(reservationNo);
     }
+
+    @Override
+    public int CountReservation(String memberId) {
+        return reservationRepository.queryCountReservation(memberId);
+    }
+
+    @Override
+    public List<ReservationProjection> rendBookList(String memberId) {
+        return reservationRepository.queryRendBookList(memberId);
+    }
+
+    @Override
+    public List<ReservationProjection> rentBookList(String memberId) {
+        return reservationRepository.queryRentBookList(memberId);
+    }
+
+    @Override
+    public int paySuccess(Long reservationNo) {
+        return reservationRepository.queryPaySuccess(reservationNo);
+    }
 }

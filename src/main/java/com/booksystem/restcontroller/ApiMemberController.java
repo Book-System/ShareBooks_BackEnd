@@ -53,7 +53,7 @@ public class ApiMemberController {
     // POST > http://localhost:9090/REST/api/member/join
     @RequestMapping(value = "/join", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> memberJoinPost(@ModelAttribute Member member,
-            @RequestParam(name = "file") MultipartFile file) throws IOException {
+            @RequestParam(name = "file") MultipartFile[] file) throws IOException {
         Map<String, Object> map = new HashMap<>();
         try {
             // 비밀번호 암호화
@@ -61,9 +61,9 @@ public class ApiMemberController {
             member.setPassword(bcpe.encode(member.getPassword()));
 
             // 이미지 설정
-            member.setImage(file.getBytes());
-            member.setImagesize(file.getSize());
-            member.setImagetype(file.getContentType());
+            member.setImage(file[0].getBytes());
+            member.setImagesize(file[0].getSize());
+            member.setImagetype(file[0].getContentType());
 
             // joinMember메소드 호출을 통해 회원가입 수행
             mService.joinMember(member);
@@ -106,7 +106,7 @@ public class ApiMemberController {
     // PUT > http://localhost:9090/REST/api/member/update
     @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> memberUpdatePut(@ModelAttribute Member member, @RequestHeader("token") String token,
-            @RequestParam(name = "file") MultipartFile file) {
+            @RequestParam("file") MultipartFile file) {
         Map<String, Object> map = new HashMap<>();
         try {
             // 토큰이 생성되었고, 유효시간이 만료되지 않았다면 회원정보수정 실행
@@ -118,7 +118,6 @@ public class ApiMemberController {
                 // 프로필 사진을 변경할 경우
                 if (file.getSize() > 0) {
                     // 회원정보 설정
-                    tempMember.setNickname(member.getNickname());
                     tempMember.setPhone(member.getPhone());
                     tempMember.setZipcode(member.getZipcode());
                     tempMember.setAddress(member.getAddress());
@@ -128,20 +127,21 @@ public class ApiMemberController {
 
                     // updateMemberWithImage메소드 호출
                     int result = mService.updateMemberWithImage(tempMember);
-                    map.put("result", Long.valueOf(result));
+                    System.out.println(result);
+                    map.put("result", 1L);
                     map.put("data", "회원정보수정을 성공했습니다.");
                 }
                 // 프로필 사진을 변경하지 않을 경우
                 else {
                     // 회원정보 설정
-                    tempMember.setNickname(member.getNickname());
                     tempMember.setPhone(member.getPhone());
                     tempMember.setZipcode(member.getZipcode());
                     tempMember.setAddress(member.getAddress());
 
                     // updateMember메소드 호출
                     int result = mService.updateMember(member);
-                    map.put("result", Long.valueOf(result));
+                    System.out.println(result);
+                    map.put("result", 1L);
                     map.put("data", "회원정보수정을 성공했습니다.");
                 }
             } else {
@@ -182,6 +182,36 @@ public class ApiMemberController {
             e.printStackTrace();
             map.put("result", 0L);
             map.put("data", "이미 사용중인 아이디입니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 회원정보 조회
+    // GET > http://localhost:9090/REST/api/member/information
+    @RequestMapping(value = "/information", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> memberInformationGet(@RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // 로그인한 사용자 이름 추출
+            String memberId = jwtUtil.extractUsername(token);
+
+            // 회원정보 조회
+            Member member = mService.getMember(memberId);
+
+            // 회원이 존재하는 경우
+            if (member != null) {
+                map.put("result", 1L);
+                map.put("data", member);
+            } else {
+                map.put("result", 0L);
+                map.put("data", "조회된 회원이 없습니다.");
+            }
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "조회된 회원이 없습니다.");
         }
         // 결과 값 리턴
         return map;
@@ -261,16 +291,17 @@ public class ApiMemberController {
     // 로그인 (아이디, 비밀번호), 로그아웃의 경우 세션스토리지의 토큰 값을 제거한다.
     // POST > http://localhost:9090/REST/api/member/login
     @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> memberLoginPost(@RequestBody Member member) {
+    public Map<String, Object> memberLoginPost(@RequestBody Map<String, Object> obj) {
         Map<String, Object> map = new HashMap<>();
         try {
+            String email = String.valueOf(obj.get("email"));
+            String password = String.valueOf(obj.get("password"));
             // member객체의 아이디와 비밀번호를 넣어 인증을 받는다.
-            authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(member.getId(), member.getPassword()));
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
             map.put("result", 1L);
             map.put("data", "로그인을 성공했습니다.");
             // member객체의 아이디를 키로하여, 토큰 값을 생성한다.
-            map.put("token", jwtUtil.generateToken(member.getId()));
+            map.put("token", jwtUtil.generateToken(email));
         } catch (Exception e) {
             // 에러를 출력한다.
             e.printStackTrace();
@@ -282,13 +313,10 @@ public class ApiMemberController {
     }
 
     // 프로필사진 조회
-    // GET > http://localhost:9090/REST/api/member/image
+    // GET > http://localhost:9090/REST/api/member/image?memberid=회원아이디
     @RequestMapping(value = "/image", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<byte[]> memberImageGet(@RequestHeader("token") String token) throws IOException {
+    public ResponseEntity<byte[]> memberImageGet(@RequestParam(name = "memberid") String memberId) throws IOException {
         try {
-            // 토큰에 해당하는 아이디를 가져온다.
-            String memberId = jwtUtil.extractUsername(token);
-
             // memberImage메소드를 호출
             Member member = mService.getMember(memberId);
 
@@ -401,10 +429,13 @@ public class ApiMemberController {
     // 이메일 인증코드 확인
     // POST > http://localhost:9090/REST/api/member/validemail
     @RequestMapping(value = "/validemail", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> memberValidEmailPost(@RequestParam(name = "memberId") String memberId,
-            @RequestParam(name = "emailCode") String emailCode) {
+    public Map<String, Object> memberValidEmailPost(@RequestBody Map<String, Object> obj) {
         Map<String, Object> map = new HashMap<>();
         try {
+            String memberId = (String) obj.get("memberId");
+            String emailCode = (String) obj.get("emailCode");
+
+            System.out.println(memberId + ", " + emailCode);
             // 1일 경우 이메일 인증 완료, 0일 경우 다시 이메일 인증을 수행해야한다.
             int result = sendEmailService.validEmailCode(memberId, emailCode, new Date());
             if (result == 1) {

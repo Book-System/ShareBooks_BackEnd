@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -117,26 +118,25 @@ public class ApiBookController {
     @RequestMapping(value = "/update", method = {
             RequestMethod.PUT }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> updateBookPut(@ModelAttribute Book book,
-            @RequestParam(name = "categoryCode") Long categoryCode,
-            @RequestParam(name = "bookimageNo") Long[] bookimageNo,
+            @RequestParam(name = "priority", required = false) Long[] priority,
             @RequestParam(name = "file", required = false) MultipartFile[] file, @RequestHeader("token") String token) {
         Map<String, Object> map = new HashMap<>();
         try {
             if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
-                Category category = categoryService.detailCategory(categoryCode);
-
-                // Category객체 설정
-                book.setCategory(category);
+                System.out.println(book.toString());
 
                 // updateBook메소드 호출
                 int result = bookService.updateBook(book);
 
                 // 책에 대한 정보가 저장되었을 경우
-                if (result == 1) {
+                if (result == 1 && file.length > 0) {
                     int count = 0;
                     // 파일로 들어온 이미지 수량만큼 저장
                     for (int i = 0; i < file.length; i++) {
-                        BookImage bookImage = bookImageService.getBookImage(bookimageNo[i]);
+                        System.out.println(file[i].getOriginalFilename());
+                        System.out.println(priority[i]);
+                        BookImage bookImage = bookImageService.mainBookImage(book.getBookNo(),
+                                Integer.parseInt(String.valueOf(priority[i])));
                         bookImage.setImagename(file[i].getOriginalFilename());
                         bookImage.setImagetype(file[i].getContentType());
                         bookImage.setImagesize(file[i].getSize());
@@ -146,11 +146,14 @@ public class ApiBookController {
                     }
                     if (count == file.length) {
                         map.put("result", 1L);
-                        map.put("data", "책 수정을 성공했습니다.");
+                        map.put("data", "책 수정(이미지포함)을 성공했습니다.");
                     } else {
                         map.put("result", 0L);
                         map.put("data", "책 수정을 실패했습니다.");
                     }
+                } else {
+                    map.put("result", 1L);
+                    map.put("data", "책 수정(이미지없음)을 성공했습니다.");
                 }
             }
         } catch (Exception e) {
@@ -165,11 +168,13 @@ public class ApiBookController {
     // DELETE > http://localhost:9090/REST/api/book/remove
     @RequestMapping(value = "/remove", method = {
             RequestMethod.DELETE }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> removeBookDelete(@RequestParam(name = "bookNo") Long bookNo,
+    public Map<String, Object> removeBookDelete(@RequestBody Map<String, Object> obj,
             @RequestHeader("token") String token) {
         Map<String, Object> map = new HashMap<>();
         try {
             if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                Long bookNo = Long.parseLong(String.valueOf(obj.get("bookNo")));
+
                 // deleteBookImage메소드, deleteBook메소드 호출
                 bookImageService.deleteBookImage(bookNo);
                 bookService.deleteBook(bookNo);
@@ -199,6 +204,53 @@ public class ApiBookController {
             e.printStackTrace();
             map.put("result", 0L);
             map.put("data", "책 목록 조회를 실패했습니다.");
+        }
+        return map;
+    }
+
+    // 주소로 책목록 구하기 (페이지네이션)
+    // GET > http://localhost:9090/REST/api/book/list/search?address=지역명&page=페이지
+    @RequestMapping(value = "/list/search", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> listAddressBookPageGet(@RequestParam(name = "address") String address,
+            @RequestParam(value = "page", defaultValue = "1") int page) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            List<BookProjection> list = bookService.listSearchBook(address, page);
+            map.put("result", 1L);
+            map.put("data", list);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "책 목록 조회를 실패했습니다.");
+        }
+        return map;
+    }
+
+    // 책 개수 조회
+    // GET > http://localhost:9090/REST/api/book/count
+    @RequestMapping(value = "/count", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> countBookGet(@RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // 로그인된 사용자를 검증
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                // 토큰 값을 사용하여 아이디 추출
+                String memberId = jwtUtil.extractUsername(token);
+
+                // 자신이 빌린 책들의 정보를 조회
+                int rendBookCount = bookService.countBook(memberId);
+                map.put("result", 1L);
+                map.put("data", rendBookCount);
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "빌린 책 조회를 실패했습니다.");
         }
         return map;
     }
@@ -257,6 +309,31 @@ public class ApiBookController {
 
             // 우선순위에 해당하는 이미지를 가져온다.
             BookImage bookImage = bookImageList.get(priority);
+            HttpHeaders headers = new HttpHeaders();
+            if (bookImage.getImagetype().equals("image/jpeg")) {
+                headers.setContentType(MediaType.IMAGE_JPEG);
+            } else if (bookImage.getImagetype().equals("image/png")) {
+                headers.setContentType(MediaType.IMAGE_PNG);
+            } else if (bookImage.getImagetype().equals("image/gif")) {
+                headers.setContentType(MediaType.IMAGE_GIF);
+            }
+            ResponseEntity<byte[]> response = new ResponseEntity<>(bookImage.getImage(), headers, HttpStatus.OK);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // 책 대표 이미지 조회
+    // GET > http://localhost:9090/REST/api/book/image/main?bookno=책번호&priority=우선순위
+    @RequestMapping(value = "/image/main", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<byte[]> BookImageMainGet(@RequestParam("bookno") Long bookNo,
+            @RequestParam("priority") int priority) {
+        try {
+            // 우선순위에 해당하는 이미지를 가져온다.
+            BookImage bookImage = bookImageService.mainBookImage(bookNo, priority);
             HttpHeaders headers = new HttpHeaders();
             if (bookImage.getImagetype().equals("image/jpeg")) {
                 headers.setContentType(MediaType.IMAGE_JPEG);
@@ -506,6 +583,33 @@ public class ApiBookController {
 
                 map.put("result", 1L);
                 map.put("data", bookLike);
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "책 찜 상세 조회를 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 책 이미지 목록 조회
+    // GET > http://localhost:9090/REST/api/book/image/list?bookno=책번호
+    @RequestMapping(value = "/image/list", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> BookImageListGet(@RequestParam("bookno") Long bookNo,
+            @RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                // removeBookLike메소드 호출
+                List<BookImage> bookImage = bookImageService.listBookImage(bookNo);
+
+                map.put("result", 1L);
+                map.put("data", bookImage);
             } else {
                 map.put("result", 0L);
                 map.put("data", "로그인 인증을 실패했습니다.");

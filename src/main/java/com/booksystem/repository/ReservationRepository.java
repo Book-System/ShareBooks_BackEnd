@@ -20,6 +20,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query(value = "SELECT * FROM RESERVATION WHERE MEMBER_ID=:memberId", nativeQuery = true)
     public List<ReservationProjection> queryListReservation(@Param("memberId") String memberId);
 
+    // 예약 개수 조회
+    @Query(value = "SELECT COUNT(*) FROM RESERVATION WHERE MEMBER_ID=:memberId", nativeQuery = true)
+    public int queryCountReservation(@Param("memberId") String memberId);
+
     // 예약 상세 조회
     @Query(value = "SELECT * FROM RESERVATION WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
     public ReservationProjection queryDetailReservation(@Param("reservationNo") Long reservationNo);
@@ -42,4 +46,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query(value = "UPDATE RESERVATION SET REJECT_MESSAGE=:rejectMessage WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
     public int queryRequestRefuseReservation(@Param("reservationNo") Long reservationNo,
             @Param("rejectMessage") String rejectMessage);
+
+    // 빌려준 책 목록 조회
+    @Query(value = "SELECT R.RESERVATION_NO, R.PHONE, R.REJECT_MESSAGE, R.REQUEST, R.REQUEST_MESSAGE, R.RESERVATION_END_DATE, R.RESERVATION_END_TIME, R.RESERVATION_START_DATE, R.RESERVATION_START_TIME, R.MEMBER_ID AS RMEMBER_ID,  B.BOOK_NO , B.MEMBER_ID AS BMEMBER_ID, B.ADDRESS, B.TITLE,  B.PRICE FROM RESERVATION R INNER JOIN BOOK B ON R.BOOK_NO=B.BOOK_NO WHERE B.MEMBER_ID=:memberId", nativeQuery = true)
+    public List<ReservationProjection> queryRendBookList(@Param("memberId") String memberId);
+
+    // 빌린 책 목록 조회
+    @Query(value = "SELECT R.RESERVATION_NO, R.PHONE, R.REJECT_MESSAGE, R.REQUEST, R.REQUEST_MESSAGE, R.RESERVATION_END_DATE, R.RESERVATION_END_TIME, R.RESERVATION_START_DATE, R.RESERVATION_START_TIME, R.MEMBER_ID AS RMEMBER_ID,  B.BOOK_NO , B.MEMBER_ID AS BMEMBER_ID, B.ADDRESS, B.TITLE,  B.PRICE FROM RESERVATION R INNER JOIN BOOK B ON R.BOOK_NO=B.BOOK_NO WHERE R.MEMBER_ID=:memberId", nativeQuery = true)
+    public List<ReservationProjection> queryRentBookList(@Param("memberId") String memberId);
+
+    // 대여자 => 결제완료
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE RESERVATION SET PAY_SUCCESS=TRUE WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
+    public int queryPaySuccess(@Param("reservationNo") Long reservationNo);
 }

@@ -24,6 +24,9 @@ public interface BookImageService {
     // 책 이미지 하나 조회
     public BookImage getBookImage(Long bookimageNo);
 
+    // 책 메인 이미지 조회
+    public BookImage mainBookImage(Long bookNo, int priority);
+
     // 책 이미지 개수 조회
     public int countBookImage(Long bookNo);
 }

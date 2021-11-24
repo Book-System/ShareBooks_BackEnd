@@ -53,6 +53,9 @@ public class Reservation {
     @Column(name = "REJECT_MESSAGE")
     private String rejectMessage = null;
 
+    @Column(name = "PAY_SUCCESS")
+    private boolean paySuccess = false;
+
     @ManyToOne
     @JoinColumn(name = "MEMBER_ID")
     private Member member;

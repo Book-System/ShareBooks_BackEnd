@@ -43,4 +43,9 @@ public class BookImageServiceImpl implements BookImageService {
     public int countBookImage(Long bookNo) {
         return bookImageRepository.queryCountBookImage(bookNo);
     }
+
+    @Override
+    public BookImage mainBookImage(Long bookNo, int priority) {
+        return bookImageRepository.queryMainBookImage(bookNo, priority);
+    }
 }

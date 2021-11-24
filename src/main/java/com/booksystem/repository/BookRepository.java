@@ -20,6 +20,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query(value = "SELECT * FROM BOOK", nativeQuery = true)
     public List<BookProjection> queryListBook();
 
+    // 책 검색 목록 조회
+    @Query(value = "SELECT * FROM (SELECT B.BOOK_NO, B.TITLE, B.PRICE, B.ADDRESS, B.TAG, B.BOOK_TITLE, B.REGDATE, M.ID AS MEMBER_ID, M.NAME AS MEMBER_NAME, M.NICKNAME AS MEMBER_NICKNAME, AVG(R.RATING) AS RATING, COUNT(R.*) AS COUNT, B.HIT, ROW_NUMBER() OVER (ORDER BY B.BOOK_NO DESC) ROWN FROM BOOK B INNER JOIN MEMBER M ON B.MEMBER_ID = M.ID LEFT OUTER JOIN REVIEW R ON B.BOOK_NO = R.BOOK_NO WHERE B.ADDRESS LIKE %:address% GROUP BY(B.BOOK_NO)) ADDRESS WHERE ROWN BETWEEN :page*4-3 AND :page*4", nativeQuery = true)
+    public List<BookProjection> queryListSearchBook(@Param("address") String address, @Param("page") int page);
+
+    // 책 개수 조회
+    @Query(value = "SELECT COUNT(*) FROM BOOK WHERE MEMBER_ID=:memberId", nativeQuery = true)
+    public int queryCountBook(String memberId);
+
     // 내가 등록한 책 목록 조회
     @Query(value = "SELECT * FROM BOOK WHERE MEMBER_ID=:memberId", nativeQuery = true)
     public List<BookProjection> queryListRendBook(@Param("memberId") String memberId);
@@ -33,7 +41,7 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     public Book queryDetailBook(@Param("bookNo") Long bookNo);
 
     // 책 상세 조회(원하는 항목만)
-    @Query(value = "SELECT * FROM BOOK WHERE BOOK_NO=:bookNo", nativeQuery = true)
+    @Query(value = "SELECT B.BOOK_NO, B.ADDRESS, B.BOOK_CONTENT, B.TITLE, B.CONTENT, B.HIT, B.PRICE, B.REGDATE, B.TAG, B.BOOK_TITLE, M.ID AS MEMBER_ID, M.NAME AS MEMBER_NAME, M.NICKNAME AS MEMBER_NICKNAME, C.NAME AS CATEGORY_NAME FROM BOOK B INNER JOIN MEMBER M ON B.MEMBER_ID=M.ID INNER JOIN CATEGORY C ON B.CATEGORY_CODE=C.CODE WHERE BOOK_NO=:bookNo", nativeQuery = true)
     public BookProjection queryDetailBookProjection(@Param("bookNo") Long bookNo);
 
     // 책 상세 조회(JPA)

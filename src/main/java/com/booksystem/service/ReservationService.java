@@ -13,6 +13,9 @@ public interface ReservationService {
     // 예약 목록 조회
     public List<ReservationProjection> listReservation(String memberId);
 
+    // 예약 개수 조회
+    public int CountReservation(String memberId);
+
     // 예약 상세 조회
     public ReservationProjection detailReservation(Long reservationNo);
 
@@ -27,4 +30,13 @@ public interface ReservationService {
 
     // 판매자 => 요청 거절, 거절 메세지
     public int requestRefuseReservation(Long reservationNo, String rejectMessage);
+
+    // 빌려준 책 목록 조회
+    public List<ReservationProjection> rendBookList(String memberId);
+
+    // 빌린 책 목록 조회
+    public List<ReservationProjection> rentBookList(String memberId);
+
+    // 대여자 => 결제완료
+    public int paySuccess(Long reservationNo);
 }

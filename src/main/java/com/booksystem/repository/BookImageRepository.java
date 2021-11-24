@@ -37,6 +37,10 @@ public interface BookImageRepository extends JpaRepository<BookImage, Long> {
     @Query(value = "SELECT * FROM BOOKIMAGE WHERE BOOK_NO=:bookNo", nativeQuery = true)
     public List<BookImage> queryListBookImage(@Param("bookNo") Long bookNo);
 
+    // 책 메인 이미지 조회
+    @Query(value = "SELECT * FROM BOOKIMAGE WHERE BOOK_NO=:bookNo AND PRIORITY=:priority", nativeQuery = true)
+    public BookImage queryMainBookImage(@Param("bookNo") Long bookNo, @Param("priority") int priority);
+
     // 책 이미지 개수 조회
     @Query(value = "SELECT COUNT(*) FROM BOOKIMAGE WHERE BOOK_NO=:bookNo GROUP BY(BOOK_NO)", nativeQuery = true)
     public int queryCountBookImage(@Param("bookNo") Long bookNo);

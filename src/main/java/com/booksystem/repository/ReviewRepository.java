@@ -44,4 +44,12 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     // 리뷰 개수 조회
     @Query(value = "SELECT COUNT(*) FROM REVIEW WHERE MEMBER_ID=:memberId AND BOOK_NO=:bookNo", nativeQuery = true)
     public int queryCountReview(@Param("memberId") String memberId, @Param("bookNo") Long bookNo);
+
+    // 평균 리뷰 점수
+    @Query(value = "SELECT BOOK_NO, AVG(RATING) RATING, COUNT(*) AS COUNT FROM REVIEW WHERE BOOK_NO=:bookNo GROUP BY(BOOK_NO)", nativeQuery = true)
+    public ReviewProjection queryAvgReview(@Param("bookNo") Long bookNo);
+
+    // 리뷰 목록 조회
+    @Query(value = "SELECT * FROM REVIEW WHERE BOOK_NO=:bookNo", nativeQuery = true)
+    public List<Review> queryBookNoReview(@Param("bookNo") Long bookNo);
 }
