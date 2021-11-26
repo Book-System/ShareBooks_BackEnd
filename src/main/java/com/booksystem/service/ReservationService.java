@@ -39,4 +39,8 @@ public interface ReservationService {
 
     // 대여자 => 결제완료
     public int paySuccess(Long reservationNo);
+
+    // 예약완료 체크
+    public int reservationCheck(Long bookNo);
+
 }

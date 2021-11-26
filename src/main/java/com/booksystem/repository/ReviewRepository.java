@@ -37,9 +37,13 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query(value = "SELECT * FROM REVIEW WHERE REVIEW_NO=:reviewNo", nativeQuery = true)
     public ReviewProjection queryDetailReview(@Param("reviewNo") Long reviewNo);
 
+    // 리뷰 객체 조회
+    @Query(value = "SELECT * FROM REVIEW WHERE REVIEW_NO=:reviewNo", nativeQuery = true)
+    public Review queryReviewGet(@Param("reviewNo") Long reviewNo);
+
     // 리뷰 목록 조회
-    @Query(value = "SELECT * FROM REVIEW", nativeQuery = true)
-    public List<ReviewProjection> queryListReview();
+    @Query(value = "SELECT B.TITLE, R.REVIEW_NO, R.CONTENT, R.RATING, R.REGDATE, R.BOOK_NO, R.MEMBER_ID FROM REVIEW R INNER JOIN BOOK B ON R.BOOK_NO=B.BOOK_NO WHERE R.MEMBER_ID=:memberId", nativeQuery = true)
+    public List<ReviewProjection> queryListReview(String memberId);
 
     // 리뷰 개수 조회
     @Query(value = "SELECT COUNT(*) FROM REVIEW WHERE MEMBER_ID=:memberId AND BOOK_NO=:bookNo", nativeQuery = true)

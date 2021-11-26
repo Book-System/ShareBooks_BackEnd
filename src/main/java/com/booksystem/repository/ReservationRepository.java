@@ -52,7 +52,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     public List<ReservationProjection> queryRendBookList(@Param("memberId") String memberId);
 
     // 빌린 책 목록 조회
-    @Query(value = "SELECT R.RESERVATION_NO, R.PHONE, R.REJECT_MESSAGE, R.REQUEST, R.REQUEST_MESSAGE, R.RESERVATION_END_DATE, R.RESERVATION_END_TIME, R.RESERVATION_START_DATE, R.RESERVATION_START_TIME, R.MEMBER_ID AS RMEMBER_ID,  B.BOOK_NO , B.MEMBER_ID AS BMEMBER_ID, B.ADDRESS, B.TITLE,  B.PRICE FROM RESERVATION R INNER JOIN BOOK B ON R.BOOK_NO=B.BOOK_NO WHERE R.MEMBER_ID=:memberId", nativeQuery = true)
+    @Query(value = "SELECT R.RESERVATION_NO, R.PHONE, R.REJECT_MESSAGE, R.REQUEST, R.REQUEST_MESSAGE, R.RESERVATION_END_DATE, R.RESERVATION_END_TIME, R.RESERVATION_START_DATE, R.RESERVATION_START_TIME, R.MEMBER_ID AS RMEMBER_ID,  B.BOOK_NO , B.MEMBER_ID AS BMEMBER_ID, B.ADDRESS, B.TITLE,  B.PRICE, R.PAY_SUCCESS FROM RESERVATION R INNER JOIN BOOK B ON R.BOOK_NO=B.BOOK_NO WHERE R.MEMBER_ID=:memberId", nativeQuery = true)
     public List<ReservationProjection> queryRentBookList(@Param("memberId") String memberId);
 
     // 대여자 => 결제완료
@@ -60,4 +60,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Modifying
     @Query(value = "UPDATE RESERVATION SET PAY_SUCCESS=TRUE WHERE RESERVATION_NO=:reservationNo", nativeQuery = true)
     public int queryPaySuccess(@Param("reservationNo") Long reservationNo);
+
+    // 예약 완료 조회
+    @Query(value = "SELECT COUNT(PAY_SUCCESS) FROM RESERVATION WHERE BOOK_NO=:bookNo AND PAY_SUCCESS=TRUE", nativeQuery = true)
+    public int queryReservationCheck(@Param("bookNo") Long bookNo);
 }

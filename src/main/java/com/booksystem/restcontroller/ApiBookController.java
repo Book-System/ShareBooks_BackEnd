@@ -127,9 +127,11 @@ public class ApiBookController {
 
                 // updateBook메소드 호출
                 int result = bookService.updateBook(book);
+                System.out.println("결과 값" + result);
+                System.out.println(file == null);
 
                 // 책에 대한 정보가 저장되었을 경우
-                if (result == 1 && file.length > 0) {
+                if (result == 1 && file != null) {
                     int count = 0;
                     // 파일로 들어온 이미지 수량만큼 저장
                     for (int i = 0; i < file.length; i++) {
@@ -151,7 +153,7 @@ public class ApiBookController {
                         map.put("result", 0L);
                         map.put("data", "책 수정을 실패했습니다.");
                     }
-                } else {
+                } else if (result == 1 && file == null) {
                     map.put("result", 1L);
                     map.put("data", "책 수정(이미지없음)을 성공했습니다.");
                 }

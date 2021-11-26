@@ -64,4 +64,9 @@ public class ReservationServiceImpl implements ReservationService {
     public int paySuccess(Long reservationNo) {
         return reservationRepository.queryPaySuccess(reservationNo);
     }
+
+    @Override
+    public int reservationCheck(Long bookNo) {
+        return reservationRepository.queryReservationCheck(bookNo);
+    }
 }

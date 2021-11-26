@@ -22,7 +22,7 @@ public interface ReviewService {
     public int updateReview(Review review);
 
     // 리뷰 목록 조회
-    public List<ReviewProjection> listReview();
+    public List<ReviewProjection> listReview(String memberId);
 
     // 평균 리뷰 점수, 리뷰 목록 조회
     public ReviewProjection avgReview(Long bookNo);
@@ -32,4 +32,7 @@ public interface ReviewService {
 
     // 리뷰 개수 조회
     public int countReview(String memberId, Long bookNo);
+
+    // 리뷰 객체 조회
+    public Review reviewGet(Long reviewNo);
 }

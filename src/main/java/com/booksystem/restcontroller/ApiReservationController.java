@@ -361,4 +361,33 @@ public class ApiReservationController {
         }
         return map;
     }
+
+    // 예약완료 조회
+    // GET > http://localhost:9090/REST/api/reservation/pay/check
+    @RequestMapping(value = "/pay/check", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> reservationPayCheckGet(@RequestParam("bookno") Long bookNo,
+            @RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                int result = reservationService.reservationCheck(bookNo);
+                if (result == 1) {
+                    map.put("result", 1L);
+                    map.put("data", "예약완료된 게시물입니다.");
+                } else {
+                    map.put("result", 0L);
+                    map.put("data", "예약되지 않은 게시물입니다.");
+                }
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "예약되지 않은 게시물입니다.");
+        }
+        return map;
+    }
 }

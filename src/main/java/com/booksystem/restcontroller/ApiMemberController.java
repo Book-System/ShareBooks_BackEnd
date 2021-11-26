@@ -106,7 +106,7 @@ public class ApiMemberController {
     // PUT > http://localhost:9090/REST/api/member/update
     @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> memberUpdatePut(@ModelAttribute Member member, @RequestHeader("token") String token,
-            @RequestParam("file") MultipartFile file) {
+            @RequestParam(name = "file", required = false) MultipartFile file) {
         Map<String, Object> map = new HashMap<>();
         try {
             // 토큰이 생성되었고, 유효시간이 만료되지 않았다면 회원정보수정 실행
@@ -116,7 +116,7 @@ public class ApiMemberController {
                 Member tempMember = mService.getMember(memberId);
 
                 // 프로필 사진을 변경할 경우
-                if (file.getSize() > 0) {
+                if (file != null) {
                     // 회원정보 설정
                     tempMember.setPhone(member.getPhone());
                     tempMember.setZipcode(member.getZipcode());
@@ -129,7 +129,7 @@ public class ApiMemberController {
                     int result = mService.updateMemberWithImage(tempMember);
                     System.out.println(result);
                     map.put("result", 1L);
-                    map.put("data", "회원정보수정을 성공했습니다.");
+                    map.put("data", "회원정보수정(이미지 포함)을 성공했습니다.");
                 }
                 // 프로필 사진을 변경하지 않을 경우
                 else {
@@ -142,7 +142,7 @@ public class ApiMemberController {
                     int result = mService.updateMember(member);
                     System.out.println(result);
                     map.put("result", 1L);
-                    map.put("data", "회원정보수정을 성공했습니다.");
+                    map.put("data", "회원정보수정(이미지 없음)을 성공했습니다.");
                 }
             } else {
                 map.put("result", 0L);
@@ -254,7 +254,6 @@ public class ApiMemberController {
         Map<String, Object> map = new HashMap<>();
         try {
             String memberId = (String) object.get("id");
-            String memberPw = (String) object.get("password");
             String memberNewPw = (String) object.get("newPassword");
 
             // 비밀번호 암호화
@@ -265,19 +264,16 @@ public class ApiMemberController {
                 // 아이디를 이용하여 정보를 가져오기
                 Member member = mService.getMember(memberId);
 
-                // DB에 저장된 암호와 입력한 암호가 동일하면 새로운 암호로 변경
-                if (bcpe.matches(memberPw, member.getPassword())) {
-                    // 새로운 비밀번호 암호화 수행
-                    member.setPassword(bcpe.encode(memberNewPw));
+                // 새로운 비밀번호 암호화 수행
+                member.setPassword(bcpe.encode(memberNewPw));
 
-                    // updatePassword메소드 호출
-                    int result = mService.updatePassword(member);
-                    map.put("result", Long.valueOf(result));
-                    map.put("data", "비밀번호 변경을 성공했습니다.");
-                } else {
-                    map.put("result", 0L);
-                    map.put("data", "비밀번호 변경을 실패했습니다.");
-                }
+                // updatePassword메소드 호출
+                int result = mService.updatePassword(member);
+                map.put("result", Long.valueOf(result));
+                map.put("data", "비밀번호 변경을 성공했습니다.");
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
             }
         } catch (Exception e) {
             // 에러를 출력한다.
@@ -319,7 +315,6 @@ public class ApiMemberController {
         try {
             // memberImage메소드를 호출
             Member member = mService.getMember(memberId);
-
             // 이미지가 있을 경우
             if (member.getImage().length > 0) {
                 HttpHeaders headers = new HttpHeaders();
@@ -450,6 +445,40 @@ public class ApiMemberController {
             e.printStackTrace();
             map.put("result", 0L);
             map.put("data", "이메일 인증을 실패하였습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 비밀번호 체크
+    // PUT > http://localhost:9090/REST/api/member/checkpw?curpw=현재비밀번호
+    @RequestMapping(value = "/checkpw", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> memberCheckPwGet(@RequestParam(name = "curpw") String curPassword,
+            @RequestHeader("token") String token) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // 비밀번호 암호화
+            BCryptPasswordEncoder bcpe = new BCryptPasswordEncoder();
+
+            // 로그인한 사용자의 아이디와 입력받은 사용자의 아이디가 일치하는 경우
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                // 아이디를 이용하여 정보를 가져오기
+                String memberId = jwtUtil.extractUsername(token);
+                Member member = mService.getMember(memberId);
+
+                // DB에 저장된 암호와 입력한 암호가 동일하면 새로운 암호로 변경
+                if (bcpe.matches(curPassword, member.getPassword())) {
+                    map.put("result", 1L);
+                    map.put("data", "비밀번호가 일치합니다.");
+                } else {
+                    map.put("result", 0L);
+                    map.put("data", "비밀번호가 일치하지 않습니다.");
+                }
+            }
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
         }
         // 결과 값 리턴
         return map;

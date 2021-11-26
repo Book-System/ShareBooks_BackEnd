@@ -15,7 +15,7 @@ import com.booksystem.service.ReviewService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,16 +41,19 @@ public class ApiReviewController {
     // 리뷰 등록
     // POST > http://localhost:9090/REST/api/review/register
     @RequestMapping(value = "/register", method = RequestMethod.POST, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> reviewRegisterPost(@ModelAttribute Review review,
-            @RequestParam(name = "bookno") Long bookNo, @RequestHeader("token") String token) throws Exception {
+    public Map<String, Object> reviewRegisterPost(@RequestBody Map<String, Object> obj,
+            @RequestHeader("token") String token) throws Exception {
         Map<String, Object> map = new HashMap<>();
         try {
             // Member객체, Book객체
             String memberId = jwtUtil.extractUsername(token);
             Member member = memberService.getMember(memberId);
-            Book book = bookService.detailBook(bookNo);
+            Book book = bookService.detailBook(Long.parseLong(String.valueOf(obj.get("book"))));
 
-            // review객체에 Member객체와 Book객체 외래키 설정
+            // Review객체
+            Review review = new Review();
+            review.setContent(String.valueOf(obj.get("content")));
+            review.setRating(Float.parseFloat(String.valueOf(obj.get("rating"))));
             review.setMember(member);
             review.setBook(book);
 
@@ -75,14 +78,16 @@ public class ApiReviewController {
     }
 
     // 리뷰 삭제
-    // DELETE > http://localhost:9090/REST/api/review/remove?reviewno=리뷰번호
+    // DELETE > http://localhost:9090/REST/api/review/remove
     @RequestMapping(value = "/remove", method = RequestMethod.DELETE, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> reviewRemoveDelete(@RequestParam Long reviewno, @RequestHeader("token") String token)
-            throws Exception {
+    public Map<String, Object> reviewRemoveDelete(@RequestBody Map<String, Object> obj,
+            @RequestHeader("token") String token) throws Exception {
         Map<String, Object> map = new HashMap<>();
         try {
+            Long reviewNo = Long.parseLong(String.valueOf(obj.get("reviewNo")));
+
             // removeReview메소드 호출
-            int result = reviewService.removeReview(reviewno);
+            int result = reviewService.removeReview(reviewNo);
 
             if (result == 1) {
                 map.put("result", 1L);
@@ -104,11 +109,14 @@ public class ApiReviewController {
     // 리뷰 수정(reviewNo, rating, content)
     // PUT > http://localhost:9090/REST/api/review/update
     @RequestMapping(value = "/update", method = RequestMethod.PUT, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> reviewUpdatePut(@ModelAttribute Review review, @RequestHeader("token") String token)
-            throws Exception {
+    public Map<String, Object> reviewUpdatePut(@RequestBody Map<String, Object> obj,
+            @RequestHeader("token") String token) throws Exception {
         Map<String, Object> map = new HashMap<>();
-        System.out.println(review.toString());
         try {
+            Review review = reviewService.reviewGet(Long.parseLong(String.valueOf(obj.get("reviewNo"))));
+            review.setContent(String.valueOf(obj.get("content")));
+            review.setRating(Float.parseFloat(String.valueOf(obj.get("rating"))));
+
             // updateReview메소드 호출
             int result = reviewService.updateReview(review);
 
@@ -155,15 +163,22 @@ public class ApiReviewController {
     // 리뷰 목록 조회
     // GET > http://localhost:9090/REST/api/review/list
     @RequestMapping(value = "/list", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> reviewListGet() throws Exception {
+    public Map<String, Object> reviewListGet(@RequestHeader("token") String token) throws Exception {
         Map<String, Object> map = new HashMap<>();
         try {
-            // listReview메소드 호출
-            List<ReviewProjection> list = reviewService.listReview();
+            if (!jwtUtil.isTokenExpired(token) && !token.isEmpty()) {
+                String memberId = jwtUtil.extractUsername(token);
 
-            map.put("result", 1L);
-            map.put("list", list);
-            map.put("data", "리뷰 목록 조회를 성공했습니다.");
+                // listReview메소드 호출
+                List<ReviewProjection> list = reviewService.listReview(memberId);
+
+                map.put("result", 1L);
+                map.put("list", list);
+                map.put("data", "리뷰 목록 조회를 성공했습니다.");
+            } else {
+                map.put("result", 0L);
+                map.put("data", "로그인 인증을 실패했습니다.");
+            }
         } catch (Exception e) {
             // 에러를 출력한다.
             e.printStackTrace();

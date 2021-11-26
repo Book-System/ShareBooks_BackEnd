@@ -37,8 +37,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<ReviewProjection> listReview() {
-        return reviewRepository.queryListReview();
+    public List<ReviewProjection> listReview(String memberId) {
+        return reviewRepository.queryListReview(memberId);
     }
 
     @Override
@@ -54,5 +54,10 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public List<Review> bookNoReview(Long bookNo) {
         return reviewRepository.queryBookNoReview(bookNo);
+    }
+
+    @Override
+    public Review reviewGet(Long reviewNo) {
+        return reviewRepository.queryReviewGet(reviewNo);
     }
 }

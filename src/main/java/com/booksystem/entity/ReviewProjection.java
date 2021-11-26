@@ -7,6 +7,8 @@ public interface ReviewProjection {
 
     Long getCount();
 
+    String getTitle();
+
     String getContent();
 
     String getRegdate();
