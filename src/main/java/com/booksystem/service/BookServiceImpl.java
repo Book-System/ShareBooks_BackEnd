@@ -69,4 +69,9 @@ public class BookServiceImpl implements BookService {
     public List<BookProjection> listSearchBook(String address, int page) {
         return bookRepository.queryListSearchBook(address, page);
     }
+
+    @Override
+    public List<BookProjection> listAddressBook(String address) {
+        return bookRepository.queryListAddressBook(address);
+    }
 }

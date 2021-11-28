@@ -16,6 +16,9 @@ public interface BookService {
     // 지역 검색 책 목록 조회
     public List<BookProjection> listSearchBook(String address, int page);
 
+    // 지역 검색 책 목록 조회
+    public List<BookProjection> listAddressBook(String address);
+
     // 책 개수 조회
     public int countBook(String memberId);
 

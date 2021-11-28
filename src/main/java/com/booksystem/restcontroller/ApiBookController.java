@@ -210,7 +210,26 @@ public class ApiBookController {
         return map;
     }
 
-    // 주소로 책목록 구하기 (페이지네이션)
+    // 책 목록 조회(주소)
+    // GET > http://localhost:9090/REST/api/book/list/total?address=지역명
+    @RequestMapping(value = "/list/total", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> listAddressBookGet(@RequestParam(name = "address") String address) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // listBook메소드 호출
+            List<BookProjection> listAddressBook = bookService.listAddressBook(address);
+            map.put("result", 1L);
+            map.put("data", listAddressBook);
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "책 목록 조회를 실패했습니다.");
+        }
+        return map;
+    }
+
+    // 주소와 페이지로 책목록 구하기 (페이지네이션)
     // GET > http://localhost:9090/REST/api/book/list/search?address=지역명&page=페이지
     @RequestMapping(value = "/list/search", method = {
             RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

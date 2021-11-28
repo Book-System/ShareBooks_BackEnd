@@ -3,6 +3,7 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.RecommendBook;
+import com.booksystem.entity.RecommendBookProjection;
 import com.booksystem.repository.RecommendRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,5 +23,10 @@ public class RecommendServiceImpl implements RecommendService {
     @Override
     public List<RecommendBook> allRecommendBooks() {
         return recommendRepository.queryAllRecommendBooks();
+    }
+
+    @Override
+    public List<RecommendBookProjection> recommendRatingBooks() {
+        return recommendRepository.queryRecommendRatingBooks();
     }
 }
