@@ -65,8 +65,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // 예약 완료 조회
     @Query(value = "SELECT COUNT(PAY_SUCCESS) FROM RESERVATION WHERE BOOK_NO=:bookNo AND PAY_SUCCESS=TRUE", nativeQuery = true)
     public int queryReservationCheck(@Param("bookNo") Long bookNo);
-<<<<<<< Updated upstream
-=======
 
     // 추가----------------------------------------------------------------------------------------------------------------------------------------
     // 고객센터 글쓰기 시 예약번호 불러오기
@@ -75,5 +73,4 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     // 예약 목록 조회(BOARD)
     @Query(value = "SELECT B.BOOK_NO, B.BOOK_TITLE, B.MEMBER_ID, R.RESERVATION_NO, R.RESERVATION_START_DATE FROM BOOK B INNER JOIN RESERVATION R ON B.BOOK_NO=R.BOOK_NO WHERE R.MEMBER_ID=:memberId GROUP BY(R.RESERVATION_NO)", nativeQuery = true)
     public List<ReservationBoardProjection> queryListReservationProjection(@Param("memberId") String memberId);
->>>>>>> Stashed changes
 }

@@ -1,22 +1,6 @@
 package com.booksystem.entity;
 
 public interface RecommendBookProjection {
-<<<<<<< Updated upstream
-    Long getBook_No();
-
-    String getAddress();
-
-    String getTitle();
-
-    Long getPrice();
-
-    String getTag();
-
-    Long getCategory_Code();
-
-    String getRating();
-}
-=======
     String getTag();
 
     Long getPrice();
@@ -39,4 +23,3 @@ public interface RecommendBookProjection {
 
     Long getCategory_Code();
 }
->>>>>>> Stashed changes

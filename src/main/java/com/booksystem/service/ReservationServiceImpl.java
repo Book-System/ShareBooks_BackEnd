@@ -70,8 +70,6 @@ public class ReservationServiceImpl implements ReservationService {
     public int reservationCheck(Long bookNo) {
         return reservationRepository.queryReservationCheck(bookNo);
     }
-<<<<<<< Updated upstream
-=======
 
     // 추가----------------------------------------------------------------------------------------------------------------------------------------
     @Override
@@ -83,5 +81,4 @@ public class ReservationServiceImpl implements ReservationService {
     public List<ReservationBoardProjection> listReservationProjection(String memberId) {
         return reservationRepository.queryListReservationProjection(memberId);
     }
->>>>>>> Stashed changes
 }

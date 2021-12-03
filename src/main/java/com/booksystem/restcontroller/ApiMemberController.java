@@ -315,6 +315,7 @@ public class ApiMemberController {
         try {
             // memberImage메소드를 호출
             Member member = mService.getMember(memberId);
+
             // 이미지가 있을 경우
             if (member.getImage().length > 0) {
                 HttpHeaders headers = new HttpHeaders();
@@ -450,8 +451,6 @@ public class ApiMemberController {
         return map;
     }
 
-<<<<<<< Updated upstream
-=======
     // 추가
     // 멤버정보호출
     // GET > http://localhost:9090/REST/api/member/memberGet
@@ -477,7 +476,6 @@ public class ApiMemberController {
         return map;
     }
 
->>>>>>> Stashed changes
     // 비밀번호 체크
     // PUT > http://localhost:9090/REST/api/member/checkpw?curpw=현재비밀번호
     @RequestMapping(value = "/checkpw", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -511,8 +509,6 @@ public class ApiMemberController {
         // 결과 값 리턴
         return map;
     }
-<<<<<<< Updated upstream
-=======
 
     // 닉네임으로 아이디 찾기
     // PUT > http://localhost:9090/REST/api/member/findid
@@ -532,5 +528,4 @@ public class ApiMemberController {
         // 결과 값 리턴
         return map;
     }
->>>>>>> Stashed changes
 }

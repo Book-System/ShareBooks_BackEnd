@@ -117,8 +117,6 @@ public class ApiRecommendController {
         // 결과 값 리턴
         return map;
     }
-<<<<<<< Updated upstream
-=======
 
     // 최신 후기 6개 가져오기
     // GET > http://localhost:9090/REST/api/recommend/comment/book
@@ -167,5 +165,4 @@ public class ApiRecommendController {
         // 결과 값 리턴
         return map;
     }
->>>>>>> Stashed changes
 }
