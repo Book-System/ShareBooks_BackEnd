@@ -35,4 +35,10 @@ public interface ReviewService {
 
     // 리뷰 객체 조회
     public Review reviewGet(Long reviewNo);
+<<<<<<< Updated upstream
+=======
+
+    // 리뷰 개수 조회(자신이 작성한 리뷰 개수 조회)
+    public int countMyReview(String memberId);
+>>>>>>> Stashed changes
 }

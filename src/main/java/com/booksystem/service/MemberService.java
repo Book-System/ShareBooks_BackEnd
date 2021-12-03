@@ -36,4 +36,7 @@ public interface MemberService {
 
     // 비밀번호 찾기
     public boolean findMemberPw(String memberId, String memberName);
+
+    // 닉네임으로 아이디찾기
+    public String findId(String nickname);
 }

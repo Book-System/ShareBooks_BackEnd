@@ -85,4 +85,11 @@ public class MemberServiceImpl implements MemberService {
             return false;
         }
     }
+
+    @Override
+    public String findId(String nickname) {
+        return mRepository.queryFindId(nickname);
+
+    }
+
 }

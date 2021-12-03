@@ -18,6 +18,26 @@
 		<java.version>11</java.version>
 	</properties>
 	<dependencies>
+		<!-- oracledb 연동 -->
+		<!-- <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>19.3.0.0</version>
+    	</dependency>
+
+		<dependency>
+			<groupId>com.zaxxer</groupId>
+			<artifactId>HikariCP</artifactId>
+			<version>2.6.0</version>
+		</dependency> -->
+
+		<!-- mybatis -->
+		<dependency>
+			<groupId>org.mybatis.spring.boot</groupId>
+			<artifactId>mybatis-spring-boot-starter</artifactId>
+			<version>2.2.0</version>
+		</dependency>
+
 		<!-- mail -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

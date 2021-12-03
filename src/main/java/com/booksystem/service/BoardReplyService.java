@@ -1,6 +1,9 @@
 package com.booksystem.service;
 
+import java.util.Optional;
+
 import com.booksystem.entity.BoardReply;
+import com.booksystem.entity.BoardReplyProjection;
 
 import org.springframework.stereotype.Service;
 
@@ -10,15 +13,11 @@ public interface BoardReplyService {
     public int insertBoardReply(BoardReply boardReply);
 
     // 고객센터 답글 조회
-    public String selectBoardReply(Long boardNo);
-    // public BoardReply selectBoardReply(Long no);
+    public Optional<BoardReplyProjection> selectBoardReply(Long boardNo);
 
     // 고객센터 답글 삭제
     public int deleteBoardReply(Long boardNo);
 
     // 고객센터 답글 수정
     public int updateBoardReply(BoardReply boardReply);
-
-    // 고객센터 답글 쓰기 전 갯수 체크
-    public int checkBoardReply(Long boardNo);
 }

@@ -1,8 +1,8 @@
 package com.booksystem.service;
 
-import java.util.Optional;
-
+import java.util.List;
 import com.booksystem.entity.Board;
+import com.booksystem.entity.BoardProjection;
 import com.booksystem.repository.BoardRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +20,8 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Optional<Board> selectOneBoard(Long boardNo) {
-        return boRepository.querySelectOneBoard(boardNo);
-    }
-
-    @Override
-    public String selectContentBoard(Long boardNo) {
-        return boRepository.querySelectContentBoard(boardNo); // 고객센터 상세페이지(내용만)
+    public List<BoardProjection> selectBoard(String memberId) {
+        return boRepository.querySelectBoard(memberId);
     }
 
     @Override
@@ -37,5 +32,10 @@ public class BoardServiceImpl implements BoardService {
     @Override
     public int updateBoard(Board board) {
         return boRepository.queryUpdateBoard(board);
+    }
+
+    @Override
+    public List<BoardProjection> selectUpdateBoard(Long boardNo) {
+        return boRepository.querySelectUpdateBoard(boardNo);
     }
 }

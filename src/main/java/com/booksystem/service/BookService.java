@@ -45,4 +45,7 @@ public interface BookService {
 
     // 책 등록
     public Book registerBook(Book book);
+
+    // 지역 검색 책 목록 조회
+    public List<BookProjection> listAddressBook(String address);
 }

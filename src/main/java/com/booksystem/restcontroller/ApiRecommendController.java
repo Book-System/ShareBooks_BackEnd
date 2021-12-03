@@ -117,4 +117,55 @@ public class ApiRecommendController {
         // 결과 값 리턴
         return map;
     }
+<<<<<<< Updated upstream
+=======
+
+    // 최신 후기 6개 가져오기
+    // GET > http://localhost:9090/REST/api/recommend/comment/book
+    @RequestMapping(value = "/comment/book", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> RecommendCommentBookGet() {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            List<RecommendBookProjection> recommendBooks = recommendService.commentBooks();
+            if (recommendBooks.size() > 0) {
+                map.put("result", 1L);
+                map.put("data", recommendBooks);
+            } else {
+                map.put("result", 1L);
+                map.put("data", "최신 후기 조회를 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "최신 후기 조회를 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+
+    // 이달의 책 6권 가져오기
+    // GET > http://localhost:9090/REST/api/recommend/month/book
+    @RequestMapping(value = "/month/book", method = {
+            RequestMethod.GET }, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> RecommendMonthBookGet() {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            List<RecommendBookProjection> recommendBooks = recommendService.monthBooks();
+            if (recommendBooks.size() > 0) {
+                map.put("result", 1L);
+                map.put("data", recommendBooks);
+            } else {
+                map.put("result", 1L);
+                map.put("data", "평점이 높은 책 목록 조회를 실패했습니다.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "평점이 높은 책 목록 조회를 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
+>>>>>>> Stashed changes
 }

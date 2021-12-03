@@ -1,6 +1,9 @@
 package com.booksystem.service;
 
+import java.util.Optional;
+
 import com.booksystem.entity.BoardReply;
+import com.booksystem.entity.BoardReplyProjection;
 import com.booksystem.repository.BoardReplyRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +21,7 @@ public class BoardReplyServiceImpl implements BoardReplyService {
     }
 
     @Override
-    public String selectBoardReply(Long boardNo) {
+    public Optional<BoardReplyProjection> selectBoardReply(Long boardNo) {
         return brRepository.querySelectBoardReply(boardNo);
     }
 
@@ -30,10 +33,5 @@ public class BoardReplyServiceImpl implements BoardReplyService {
     @Override
     public int updateBoardReply(BoardReply boardReply) {
         return brRepository.queryUpdateBoardReply(boardReply);
-    }
-
-    @Override
-    public int checkBoardReply(Long boardNo) {
-        return brRepository.queryCheckBoardReply(boardNo);
     }
 }

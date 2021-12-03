@@ -252,4 +252,25 @@ public class ApiReviewController {
         // 결과 값 리턴
         return map;
     }
+
+    // 자신이 작성한 리뷰 개수 조회
+    // GET > http://localhost:9090/REST/api/review/mycount
+    @RequestMapping(value = "/mycount", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> reviewMyCountGet(@RequestHeader("token") String token) throws Exception {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            String memberId = jwtUtil.extractUsername(token);
+            // countMyReview메소드 호출
+            int count = reviewService.countMyReview(memberId);
+            map.put("result", 1L);
+            map.put("data", count);
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "리뷰 개수 조회를 실패했습니다.");
+        }
+        // 결과 값 리턴
+        return map;
+    }
 }

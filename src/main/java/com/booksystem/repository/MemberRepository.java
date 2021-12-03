@@ -95,4 +95,8 @@ public interface MemberRepository extends JpaRepository<Member, String> {
         @Query(value = "SELECT COUNT(*) FROM EMAILCODE WHERE ID=:memberId AND CODE=:emailCode AND VALIDDATE>=:curDate", nativeQuery = true)
         public int queryValidEmailCode(@Param("memberId") String memberId, @Param("emailCode") String emailCode,
                         @Param("curDate") Date curDate);
+
+        // 닉네임으로 아이디찾기
+        @Query(value = "SELECT ID FROM MEMBER WHERE NICKNAME=:nickname", nativeQuery = true)
+        public String queryFindId(@Param("nickname") String nickname);
 }

@@ -3,6 +3,7 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.Reservation;
+import com.booksystem.entity.ReservationBoardProjection;
 import com.booksystem.entity.ReservationProjection;
 import com.booksystem.repository.ReservationRepository;
 
@@ -69,4 +70,18 @@ public class ReservationServiceImpl implements ReservationService {
     public int reservationCheck(Long bookNo) {
         return reservationRepository.queryReservationCheck(bookNo);
     }
+<<<<<<< Updated upstream
+=======
+
+    // 추가----------------------------------------------------------------------------------------------------------------------------------------
+    @Override
+    public Reservation findByReservationNo(Long reservationNo) {
+        return reservationRepository.findByReservationNo(reservationNo);
+    }
+
+    @Override
+    public List<ReservationBoardProjection> listReservationProjection(String memberId) {
+        return reservationRepository.queryListReservationProjection(memberId);
+    }
+>>>>>>> Stashed changes
 }

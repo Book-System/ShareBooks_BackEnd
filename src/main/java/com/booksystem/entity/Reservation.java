@@ -1,9 +1,15 @@
 package com.booksystem.entity;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.SequenceGenerator;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -64,4 +70,8 @@ public class Reservation {
     @JoinColumn(name = "BOOK_NO")
     private Book book;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @CreationTimestamp
+    @Column(name = "REGDATE", updatable = false)
+    private Date regdate;
 }

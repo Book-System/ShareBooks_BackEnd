@@ -29,4 +29,18 @@ public class RecommendServiceImpl implements RecommendService {
     public List<RecommendBookProjection> recommendRatingBooks() {
         return recommendRepository.queryRecommendRatingBooks();
     }
+<<<<<<< Updated upstream
 }
+=======
+
+    @Override
+    public List<RecommendBookProjection> commentBooks() {
+        return recommendRepository.queryCommentBooks();
+    }
+
+    @Override
+    public List<RecommendBookProjection> monthBooks() {
+        return recommendRepository.queryMonthBooks();
+    }
+}
+>>>>>>> Stashed changes

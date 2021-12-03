@@ -450,6 +450,34 @@ public class ApiMemberController {
         return map;
     }
 
+<<<<<<< Updated upstream
+=======
+    // 추가
+    // 멤버정보호출
+    // GET > http://localhost:9090/REST/api/member/memberGet
+    @RequestMapping(value = "/memberGet", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> memberGet(@RequestHeader("token") String token) throws IOException {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            // 토큰에 해당하는 아이디를 가져온다.
+            String memberId = jwtUtil.extractUsername(token);
+            // memberImage메소드를 호출
+            Member member = mService.getMember(memberId);
+
+            map.put("member", member);
+            map.put("result", 1L);
+            map.put("data", "멤버 정보 호출을 성공하였습니다.");
+            return map;
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+            map.put("data", "멤버 정보 호출을 실패하였습니다.");
+        }
+        return map;
+    }
+
+>>>>>>> Stashed changes
     // 비밀번호 체크
     // PUT > http://localhost:9090/REST/api/member/checkpw?curpw=현재비밀번호
     @RequestMapping(value = "/checkpw", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -483,4 +511,26 @@ public class ApiMemberController {
         // 결과 값 리턴
         return map;
     }
+<<<<<<< Updated upstream
+=======
+
+    // 닉네임으로 아이디 찾기
+    // PUT > http://localhost:9090/REST/api/member/findid
+    @RequestMapping(value = "/findid", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> memberFindIdGet(@RequestParam("nickname") String nickName) {
+        Map<String, Object> map = new HashMap<>();
+        try {
+            String memberId = mService.findId(nickName);
+            map.put("data", memberId);
+            map.put("result", 1L);
+
+        } catch (Exception e) {
+            // 에러를 출력한다.
+            e.printStackTrace();
+            map.put("result", 0L);
+        }
+        // 결과 값 리턴
+        return map;
+    }
+>>>>>>> Stashed changes
 }

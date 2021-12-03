@@ -4,6 +4,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import com.booksystem.entity.BoardImage;
+import com.booksystem.entity.BoardImageProjection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -35,11 +36,11 @@ public interface BoardImageRepository extends JpaRepository<BoardImage, Long> {
     @Query(value = "UPDATE BOARDIMAGE SET IMAGE=:#{#boardImage.image}, IMAGENAME=:#{#boardImage.imagename}, IMAGESIZE=:#{#boardImage.imagesize}, IMAGETYPE=:#{#boardImage.imagetype} WHERE BOARDIMAGE_NO=:#{#boardImage.boardimageNo}", nativeQuery = true)
     public int queryUpdateBoardImage(@Param("boardImage") BoardImage boardImage);
 
-    // 고객센터 이미지 갯수 체크
-    @Query(value = "SELECT COUNT(*) FROM BOARDIMAGE WHERE BOARD_NO=:boardNo GROUP BY (BOARD_NO)", nativeQuery = true)
-    public int queryCheckBoardImage(@Param("boardNo") Long boardNo);
+    // 이미지 우선순위 번호 받아오기
+    @Query(value = "SELECT * FROM BOARDIMAGE WHERE BOARD_NO = :boardNo", nativeQuery = true)
+    public List<BoardImageProjection> queryfindBoardImagePriority(@Param("boardNo") Long boardNo);
 
-    // 이미지 번호 받아오기
-    @Query(value = "SELECT * FROM BOARDIMAGE WHERE BOARDIMAGE_NO = :boardimageNo", nativeQuery = true)
-    public BoardImage queryfindBoardImage(@Param("boardimageNo") Long boardimageNo);
+    // 고객센터 글수정 시 이미지 조회
+    @Query(value = "SELECT * FROM BOARDIMAGE WHERE BOARD_NO=:boardNo AND PRIORITY=:priority", nativeQuery = true)
+    public BoardImage queryFindBoardImage(@Param("boardNo") Long boardNo, @Param("priority") int priority);
 }

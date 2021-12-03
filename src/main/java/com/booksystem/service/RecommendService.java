@@ -18,4 +18,14 @@ public interface RecommendService {
 
     // 평점이 높은 책 20권 추천
     public List<RecommendBookProjection> recommendRatingBooks();
+<<<<<<< Updated upstream
 }
+=======
+
+    // 최신 리뷰 4개 조회
+    public List<RecommendBookProjection> commentBooks();
+
+    // 이달의 인기 책 6권 조회
+    public List<RecommendBookProjection> monthBooks();
+}
+>>>>>>> Stashed changes

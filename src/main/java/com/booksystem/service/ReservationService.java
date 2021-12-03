@@ -3,6 +3,7 @@ package com.booksystem.service;
 import java.util.List;
 
 import com.booksystem.entity.Reservation;
+import com.booksystem.entity.ReservationBoardProjection;
 import com.booksystem.entity.ReservationProjection;
 
 import org.springframework.stereotype.Service;
@@ -43,4 +44,13 @@ public interface ReservationService {
     // 예약완료 체크
     public int reservationCheck(Long bookNo);
 
+<<<<<<< Updated upstream
+=======
+    // 추가----------------------------------------------------------------------------------------------------------------------------------------
+    // 고객센터 글쓰기 시 예약번호 불러오기
+    public Reservation findByReservationNo(Long reservationNo);
+
+    // 예약 목록 조회(BOARD)
+    public List<ReservationBoardProjection> listReservationProjection(String memberId);
+>>>>>>> Stashed changes
 }

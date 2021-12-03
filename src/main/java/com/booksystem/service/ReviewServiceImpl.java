@@ -60,4 +60,13 @@ public class ReviewServiceImpl implements ReviewService {
     public Review reviewGet(Long reviewNo) {
         return reviewRepository.queryReviewGet(reviewNo);
     }
+<<<<<<< Updated upstream
+=======
+
+    @Override
+    public int countMyReview(String memberId) {
+        return reviewRepository.queryCountMyReview(memberId);
+    }
+
+>>>>>>> Stashed changes
 }

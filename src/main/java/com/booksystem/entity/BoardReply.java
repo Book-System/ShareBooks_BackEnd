@@ -34,8 +34,4 @@ public class BoardReply {
     @ManyToOne
     @JoinColumn(name = "BOARD_NO")
     private Board board;
-
-    @ManyToOne
-    @JoinColumn(name = "MEMBER_ID")
-    private Member member;
 }
