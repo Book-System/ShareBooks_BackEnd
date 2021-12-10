@@ -311,13 +311,24 @@ public class ApiMemberController {
     // 프로필사진 조회
     // GET > http://localhost:9090/REST/api/member/image?memberid=회원아이디
     @RequestMapping(value = "/image", method = RequestMethod.GET, consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<byte[]> memberImageGet(@RequestParam(name = "memberid") String memberId) throws IOException {
+    public ResponseEntity<byte[]> memberImageGet(@RequestParam(name = "memberid", required = false) String memberId)
+            throws IOException {
         try {
             // memberImage메소드를 호출
             Member member = mService.getMember(memberId);
 
-            // 이미지가 있을 경우
-            if (member.getImage().length > 0) {
+            // 이미지가 없을 경우 기본 이미지 제공
+            if (member == null) {
+                // 기본 이미지 출력
+                InputStream iStream = resourceLoader.getResource("classpath:/static/images/default.png")
+                        .getInputStream();
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.IMAGE_PNG);
+                ResponseEntity<byte[]> response = new ResponseEntity<>(iStream.readAllBytes(), headers, HttpStatus.OK);
+                return response;
+            }
+            // 이미지가 있을 경우 저장된 이미지 제공
+            else {
                 HttpHeaders headers = new HttpHeaders();
                 if (member.getImagetype().equals("image/jpeg")) {
                     headers.setContentType(MediaType.IMAGE_JPEG);
@@ -328,14 +339,6 @@ public class ApiMemberController {
                 }
                 // 저장된 이미지 출력
                 ResponseEntity<byte[]> response = new ResponseEntity<>(member.getImage(), headers, HttpStatus.OK);
-                return response;
-            } else {
-                // 기본 이미지 출력
-                InputStream iStream = resourceLoader.getResource("classpath:/static/images/default.png")
-                        .getInputStream();
-                HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.IMAGE_PNG);
-                ResponseEntity<byte[]> response = new ResponseEntity<>(iStream.readAllBytes(), headers, HttpStatus.OK);
                 return response;
             }
         } catch (Exception e) {
