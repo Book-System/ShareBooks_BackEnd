@@ -145,3 +145,84 @@ public class JwtUtil {
 - 확장성: 토큰 기반 인증을 사용하는 다른 시스템에 접근이 가능하다.
 - 무결성: HMAC(Hash-based Message Authentication) 기법이라고 불리며, 발급 후 토큰의 정보를 변경하는 행위는 불가능하다.
 - 보안성: 클라이언트가 서버에 요청을 할 때, 쿠키를 전달하지 않기 때문에 쿠키의 취약점은 사라진다.
+
+---
+
+## 로그인 시 토큰 발행 문제
+### 1. 문제정의
+- 로그인 후, 사용자 인증을 위한 토큰 발행 문제가 발생
+
+### 2. 사실수집
+- 요청과 응답에 토큰을 함께 보내 이 사용자가 유효한 사용자인지를 판단하기 위해 토큰을 사용해야한다.
+
+### 3. 원인추론
+- 토큰을 발행하기 위한 코드 미작성
+
+### 4. 조사방법결정
+- Json Web Token(JWT)의 개념과 사용방법에 대해 조사 및 프로젝트에 적용
+
+### 5. 조사방법구현
+``` Java
+@Service
+public class JwtUtil {
+    private final String SECRETKEY = "2asdjklajdlas";
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = Jwts.parser().setSigningKey(SECRETKEY).parseClaimsJws(token).getBody();
+        return claimsResolver.apply(claims);
+    }
+
+    public String generateToken(String memberid) {
+        long tokenValidTime = 1000 * 60 * 60 * 24; // 토큰 유효시간 설정
+
+        Map<String, Object> claims = new HashMap<>();
+        String token = Jwts.builder().setClaims(claims).setSubject(memberid)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + tokenValidTime))
+                .signWith(SignatureAlgorithm.HS256, SECRETKEY).compact();
+
+        return token;
+    }
+
+    // 토큰에서 해당 아이디 정보 가져오기
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    // 토큰에서 만료시간 가져오기
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    // 토큰의 만료시간이 유효한지 확인
+    public Boolean isTokenExpired(String token) {
+        return this.extractExpiration(token).before(new Date());
+    }
+
+    // 토큰 유효성 확인
+    public Boolean validateToken(String token, String memberid) {
+        final String username = this.extractUsername(token);
+
+        if (username.equals(memberid) && !isTokenExpired(token)) {
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+### 6. 문제해결
+- JWT를 도입함으로써, 사용자 인증뿐만 아니라 기존 쿠키/세션을 사용하는 방식보다 많은 보안 이슈를 막을 수 있다.
+=> 서버는 클라이언트로부터 받은 JWT가 유효할 경우, 리소스를 사용하도록 허가하고 쿠키를 사용하지 않기 때문에 CORS이슈가 발생하지 않는다.
+
+**[토큰 기반 인증 동작방식]**
+- 클라이언트가 아이디와 비밀번호를 서버에게 전달하며 인증 요청
+- 서버는 아이디와 비밀번호를 통해 유효한 사용자인지 검증하고, 유효한 사용자인 경우 토큰을 생성해서 응답
+- 클라이언트는 토큰을 저장해두었다가, 인증이 필요한 api에 요청할 때 토큰 정보와 함께 요청
+- 서버는 토큰이 유효한지 검증하고, 유효한 경우 응답
+
+**[토큰 기반 인증 방식의 특징]**
+- 무상태성: 사용자의 인증 정보가 담겨있는 토큰을 클라이언트에 저장하기 때문에 서버에서 별도의 저장소가 필요없어 완전한 무상태를 가질 수 있다.
+- 확장성: 토큰 기반 인증을 사용하는 다른 시스템에 접근이 가능하다.
+- 무결성: HMAC(Hash-based Message Authentication) 기법이라고 불리며, 발급 후 토큰의 정보를 변경하는 행위는 불가능하다.
+- 보안성: 클라이언트가 서버에 요청을 할 때, 쿠키를 전달하지 않기 때문에 쿠키의 취약점은 사라진다.
